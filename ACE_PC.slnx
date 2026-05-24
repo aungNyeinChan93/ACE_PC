@@ -1,1 +1,7 @@
-<Solution />
+<Solution>
+  <Project Path="ACE_PC.Api/ACE_PC.Api.csproj" />
+  <Project Path="ACE_PC.BL/ACE_PC.BL.csproj" />
+  <Project Path="ACE_PC.BlazorServer/ACE_PC.BlazorServer.csproj" />
+  <Project Path="ACE_PC.Database/ACE_PC.Database.csproj" />
+  <Project Path="ACE_PC.Domain/ACE_PC.Domain.csproj" />
+</Solution>
