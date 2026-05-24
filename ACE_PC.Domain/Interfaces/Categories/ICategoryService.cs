@@ -11,5 +11,11 @@ namespace ACE_PC.Domain.Interfaces.Categories
         Task<ResultModel<CategoriesResponse>> GetAllAsync();
 
         Task<ResultModel<CategoryResponse>> GetOneByIdAsync(int id);
+
+        //createCategory(CreateCategoryRequest)
+        Task<ResultModel<CreateCategoryResponse>> CreateCategory(CreateCategoryRequest request);
+
+        //DeleteCategory
+        Task<ResultModel<bool>> DeleteCategoryAsync(int id);
     }
 }

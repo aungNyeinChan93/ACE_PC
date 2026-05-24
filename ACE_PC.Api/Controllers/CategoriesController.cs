@@ -1,5 +1,6 @@
 ﻿using ACE_PC.Domain.Helpers.ReqResHelper;
 using ACE_PC.Domain.Interfaces.Categories;
+using ACE_PC.Domain.Models.Categories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.ClientModel.Primitives;
@@ -26,7 +27,7 @@ namespace ACE_PC.Api.Controllers
             {
                 if (response.ResponseType == EnumResponseType.Pending)
                 {
-                    return StatusCode(102,response);
+                    return StatusCode(102, response);
                 }
                 if (response.ResponseType == EnumResponseType.ValidationError)
                 {
@@ -61,6 +62,50 @@ namespace ACE_PC.Api.Controllers
                 }
             }
 
+            return Ok(response);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] CreateCategoryRequest request)
+        {
+            var response = await _categoryService.CreateCategory(request);
+            if (response.IsError)
+            {
+                if (response.ResponseType == EnumResponseType.Pending)
+                {
+                    return StatusCode(102, response);
+                }
+                if (response.ResponseType == EnumResponseType.ValidationError)
+                {
+                    return BadRequest(response);
+                }
+                if (response.ResponseType == EnumResponseType.SystemError)
+                {
+                    return StatusCode(500, response);
+                }
+            }
+            return Ok(response);
+        }
+
+        [HttpDelete("{id:int}")]
+        public async Task<IActionResult> Delete([FromRoute] int id)
+        {
+            var response = await _categoryService.DeleteCategoryAsync(id);
+            if (response.IsError)
+            {
+                if (response.ResponseType == EnumResponseType.Pending)
+                {
+                    return StatusCode(102, response);
+                }
+                if (response.ResponseType == EnumResponseType.ValidationError)
+                {
+                    return BadRequest(response);
+                }
+                if (response.ResponseType == EnumResponseType.SystemError)
+                {
+                    return StatusCode(500, response);
+                }
+            }
             return Ok(response);
         }
     }
