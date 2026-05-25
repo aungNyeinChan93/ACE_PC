@@ -16,5 +16,9 @@ namespace ACE_PC.Database.Data
         public DbSet<Author> Authors { get; set; }
         public DbSet<Todo> Todos { get; set; }
         public DbSet<Category> Categories { get; set; }
+
+        public DbSet<User> Users { get; set; }
+
+        public DbSet<Role> Roles { get; set; }
     }
 }

@@ -1,7 +1,19 @@
 ﻿@page "/"
+@using Newtonsoft.Json
 
 <PageTitle>Home</PageTitle>
 
 <h1>Hello, world!</h1>
 
-Welcome to your new app.
+<AuthorizeView>
+    <Authorized>
+        Welcome @context.User.Identity?.Name!
+        <pre>
+            @* @(JsonConvert.SerializeObject(context.User)) *@
+        </pre>
+    </Authorized>
+    <NotAuthorized>
+        Guest 
+    </NotAuthorized>
+</AuthorizeView>
+

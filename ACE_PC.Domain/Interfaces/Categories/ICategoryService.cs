@@ -17,5 +17,8 @@ namespace ACE_PC.Domain.Interfaces.Categories
 
         //DeleteCategory
         Task<ResultModel<bool>> DeleteCategoryAsync(int id);
+
+        //update category
+        Task<ResultModel<UpdateCategoryResponse>> UpdateCategory(int id,UpdateCategoryRequest request);
     }
 }

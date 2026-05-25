@@ -1,6 +1,7 @@
 ﻿using ACE_PC.Domain.Helpers.ReqResHelper;
 using ACE_PC.Domain.Interfaces.Categories;
 using ACE_PC.Domain.Models.Categories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.ClientModel.Primitives;
@@ -8,6 +9,7 @@ using System.Net.WebSockets;
 
 namespace ACE_PC.Api.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class CategoriesController : ControllerBase

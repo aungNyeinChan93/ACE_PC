@@ -1,4 +1,4 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿<div class="top-row navbar navbar-dark ps-3">
     <div class="container-fluid">
         <a class="navbar-brand" href="">ACE_PC.BlazorServer</a>
     </div>
@@ -8,6 +8,22 @@
 
 <div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
     <nav class="nav flex-column">
+        <AuthorizeView>
+            <NotAuthorized>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="login" Match="NavLinkMatch.All">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-in-right" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M6 3.5a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-2a.5.5 0 0 0-1 0v2A1.5 1.5 0 0 0 6.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-8A1.5 1.5 0 0 0 5 3.5v2a.5.5 0 0 0 1 0z" />
+                            <path fill-rule="evenodd" d="M11.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H1.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708z" />
+                        </svg>
+                        Login
+                    </NavLink>
+                </div>
+
+            </NotAuthorized>
+        </AuthorizeView>
+
+       
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
                 <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
@@ -25,6 +41,22 @@
                 <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
             </NavLink>
         </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="categories">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Categories
+            </NavLink>
+        </div>
+
+        <AuthorizeView>
+            <Authorized>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="logout">
+                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Logout
+                    </NavLink>
+                </div>
+            </Authorized>
+        </AuthorizeView>
     </nav>
 </div>
 

@@ -23,6 +23,7 @@ namespace ACE_PC.BL.Services
 
 
 
+        //getall
         public async Task<ResultModel<CategoriesResponse>> GetAllAsync()
         {
             var responseModel = new ResultModel<CategoriesResponse>();
@@ -47,6 +48,8 @@ namespace ACE_PC.BL.Services
             return responseModel;
         }
 
+
+        //getone
         public async Task<ResultModel<CategoryResponse>> GetOneByIdAsync(int id)
         {
             var responseModel = new ResultModel<CategoryResponse>();
@@ -114,6 +117,33 @@ namespace ACE_PC.BL.Services
             responseModel = result >= 1
                 ? ResultModel<bool>.Success(204, "Delete Success", true)
                 : ResultModel<bool>.SystemError(500,"Delete fail");
+
+        skip:
+            return responseModel;
+        }
+
+        public async Task<ResultModel<UpdateCategoryResponse>> UpdateCategory(int id, UpdateCategoryRequest request)
+        {
+
+            var responseModel = new ResultModel<UpdateCategoryResponse>();
+
+            var updateCategory = await _context.Categories.AsNoTracking()
+                .FirstOrDefaultAsync(c=>c.CategoryId == id);
+
+            if (updateCategory is null)
+            {
+                responseModel = ResultModel<UpdateCategoryResponse>.ValidationError(400, "Category Not Found!");
+                goto skip;
+            }
+
+            updateCategory.Name = request.Name;
+            _context.Entry(updateCategory).State = EntityState.Modified;
+            var result = await  _context.SaveChangesAsync();
+
+            responseModel = result >= 1
+                ? ResultModel<UpdateCategoryResponse>
+                .Success(200, "Update Success", new UpdateCategoryResponse { Category = updateCategory })
+                : ResultModel<UpdateCategoryResponse>.SystemError(500, "Update Fail");
 
         skip:
             return responseModel;

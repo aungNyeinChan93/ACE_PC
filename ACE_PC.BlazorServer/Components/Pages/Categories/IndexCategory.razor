@@ -1,0 +1,99 @@
+﻿@page "/categories"
+@inject CategoriesUseCase CategoriesUseCase;
+@inject NavigationManager NavigationManager;
+@inject IToastService toastService
+
+<section>
+    <h3>Category List</h3>
+    @if (Categories is not null || Categories!.Count >= 1)
+    {
+        <table class="table-responsive my-4 table p-3">
+            <thead>
+                <tr>
+                    <th scope="col">No</th>
+                    <th scope="col">Category Name</th>
+                    <th scope="col">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var category in Categories)
+                {
+                    <tr>
+                        <th scope="row">@category.CategoryId</th>
+                        <td>@category.Name</td>
+                        <td>
+                            <div class="d-flex justify-content-start gap-3">
+                                <button type="button" class="btn btn-secondary">Edit</button>
+                                <button @onclick="()=>{ DeleteId = category.CategoryId ; Modal.Show();}" type="button" class="btn btn-danger">Delete</button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p>Loading  ... </p>
+    }
+</section>
+
+<AppModal @ref="Modal">
+    <Title>Notification</Title>
+    <Body>
+        Are You Sure Wnat to delete
+    </Body>
+    <Footer>
+        <button type="button" @onclick="()=> Modal.Close()" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" @onclick="DeleteCategory" class="btn btn-danger">Delete </button>
+    </Footer>
+</AppModal>
+
+
+@code {
+
+    public List<Category> Categories { get; set; } = [];
+
+    public AppModal Modal { get; set; }
+
+    public int DeleteId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        toastService.ShowSuccess("test");
+        await this.LoadCategories();
+        // return base.OnInitializedAsync();
+    }
+
+    private async Task LoadCategories()
+    {
+        var response = await CategoriesUseCase.GetAllAsync();
+        if (response.IsError)
+        {
+            NavigationManager.NavigateTo("/");
+        }
+
+        var categories = response.Data!.Categoreis;
+
+        if (categories!.Count >= 1)
+        {
+            Categories = [.. categories];
+        }
+
+        
+    }
+
+    private async Task DeleteCategory()
+    {
+        var response = await CategoriesUseCase.DeleteCategory(DeleteId);
+        if (response.IsSuccess)
+        {
+            toastService.ShowSuccess("Delete Success");
+            NavigationManager.NavigateTo("/categories");
+            Modal.Close();
+            await this.LoadCategories();
+        }
+    }
+
+}

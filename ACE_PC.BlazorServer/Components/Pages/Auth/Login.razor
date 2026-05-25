@@ -1,0 +1,47 @@
+﻿@page "/login"
+@layout EmptyLayout
+
+@inject AuthUseCase AuthUseCase;
+@inject NavigationManager NavigationManager;
+
+<section>
+    <h3>Login</h3>
+    <div class="w-500 container mx-auto">
+        <EditForm Model="LoginModel" FormName="Login" OnValidSubmit="OnLogin">
+            <DataAnnotationsValidator/>
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <InputText class="form-control" id="email"  @bind-Value="LoginModel.Email"/>
+                <ValidationMessage For="()=>LoginModel.Email"/>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <InputText class="form-control" id="password" @bind-Value="LoginModel.Password" />
+                <ValidationMessage For="() => LoginModel.Password" />
+            </div>
+            <div class="my-2">
+                <button type="submit" class="btn btn-primary" > Login</button>
+            </div>
+
+        </EditForm>
+    </div>
+</section>
+
+@code {
+
+    [SupplyParameterFromForm(FormName = "Login")]
+    public LoginRequest LoginModel { get; set; } = new LoginRequest();
+
+
+
+    private async Task OnLogin()
+    {
+        var response = await AuthUseCase.LoginAsync(LoginModel);
+
+        if (response.IsSuccess)
+        {
+            NavigationManager.NavigateTo("/");
+        }
+    }
+
+}

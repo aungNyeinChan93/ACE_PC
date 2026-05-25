@@ -1,0 +1,48 @@
+﻿
+
+<div class="modal @(ShowModal ? "d-block":"d-none")" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">@Title</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" @onclick="Close" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>@Body</p>
+            </div>
+            <div class="modal-footer">
+               
+                @Footer
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (ShowModal)
+{
+    <div class="modal-backdrop fade show"></div>
+}
+
+@code {
+    [Parameter]
+    public RenderFragment Title { get; set; }
+
+    [Parameter]
+    public RenderFragment Body { get; set; }
+
+    [Parameter]
+    public RenderFragment Footer { get; set; }
+
+    public bool ShowModal { get; set; } = false;
+
+    public void Show()
+    {
+        ShowModal = true;
+    }
+
+    public void Close()
+    {
+        ShowModal = false;
+    }
+
+}
