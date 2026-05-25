@@ -1,0 +1,31 @@
+﻿@page "/profile";
+@inject UserUseCases UserUseCases;
+
+<section>
+    <h3>Profile</h3>
+    
+</section>
+
+
+<pre>
+    @(JsonConvert.SerializeObject(AuthUser,Formatting.Indented))
+</pre>
+
+@code {
+
+    public User AuthUser { get; set; } = null!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = await UserUseCases.GetAuthUser();
+        if (user is not null)
+        {
+            AuthUser = user;
+        }
+    }
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+       
+    }
+}

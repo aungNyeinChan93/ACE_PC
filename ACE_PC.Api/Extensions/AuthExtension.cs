@@ -6,9 +6,14 @@ namespace ACE_PC.Api.Extensions
 {
     public static class AuthExtension
     {
-        public static IServiceCollection MapAuth(this IServiceCollection services,IConfiguration configuration)
+        public static IServiceCollection MapAuth(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            services.AddAuthentication(options =>
+                {
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                }
+            )
                 .AddJwtBearer(options =>
                 {
                     options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters()
@@ -19,7 +24,7 @@ namespace ACE_PC.Api.Extensions
                         IssuerSigningKey = new SymmetricSecurityKey(
                             Encoding.UTF8.GetBytes(configuration.GetValue<string>("JWT:secret")!))
                     };
-                    
+
                 });
 
             services.AddAuthorization();

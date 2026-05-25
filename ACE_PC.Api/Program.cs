@@ -3,6 +3,7 @@ using ACE_PC.BL.Services;
 using ACE_PC.Database.Data;
 using ACE_PC.Domain.Interfaces.Auth;
 using ACE_PC.Domain.Interfaces.Categories;
+using ACE_PC.Domain.Interfaces.Users;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 
@@ -20,6 +21,7 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddCors(options =>
 {

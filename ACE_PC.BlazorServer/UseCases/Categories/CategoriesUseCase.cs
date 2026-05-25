@@ -19,9 +19,9 @@ namespace ACE_PC.BlazorServer.UseCases.Categories
 
         public async Task SetAuthHeader()
         {
-             var token = (await _localStorage.GetAsync<string>("jwtAuth")).Value;
+            var token = (await _localStorage.GetAsync<string>("jwtAuth")).Value;
 
-            if (token is not null)
+            if (token is not null)  
             {
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
             }
