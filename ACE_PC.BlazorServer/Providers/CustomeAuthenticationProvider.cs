@@ -47,7 +47,7 @@ namespace ACE_PC.BlazorServer.Providers
 
         public async Task MaskUserAsLogout()
         {
-            await _localStorage.DeleteAsync("jwtAUth");
+            await _localStorage.DeleteAsync("jwtAuth");
             var user = new ClaimsPrincipal(
                 new ClaimsIdentity());
 

@@ -3,6 +3,8 @@
 @inject NavigationManager NavigationManager;
 @inject IToastService toastService
 
+
+
 <section>
     <h3>Category List</h3>
     @if (Categories is not null || Categories!.Count >= 1)
@@ -24,7 +26,11 @@
                         <td>
                             <div class="d-flex justify-content-start gap-3">
                                 <button type="button" class="btn btn-secondary">Edit</button>
-                                <button @onclick="()=>{ DeleteId = category.CategoryId ; Modal.Show();}" type="button" class="btn btn-danger">Delete</button>
+                                <AuthorizeView Roles="admin">
+                                    <Authorized>
+                                        <button @onclick="() => { DeleteId = category.CategoryId; Modal.Show(); }" type="button" class="btn btn-danger">Delete</button>
+                                    </Authorized>
+                                </AuthorizeView>
                             </div>
                         </td>
                     </tr>
@@ -39,13 +45,15 @@
     }
 </section>
 
+
+
 <AppModal @ref="Modal">
     <Title>Notification</Title>
     <Body>
         Are You Sure Wnat to delete
     </Body>
     <Footer>
-        <button type="button" @onclick="()=> Modal.Close()" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" @onclick="() => Modal.Close()" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
         <button type="button" @onclick="DeleteCategory" class="btn btn-danger">Delete </button>
     </Footer>
 </AppModal>
@@ -61,7 +69,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        toastService.ShowSuccess("test");
         await this.LoadCategories();
         // return base.OnInitializedAsync();
     }

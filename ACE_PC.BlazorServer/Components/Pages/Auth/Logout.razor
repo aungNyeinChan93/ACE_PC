@@ -1,12 +1,14 @@
 ﻿@page "/logout"
 @inject AuthenticationStateProvider AuthenticationStateProvider;
-@using ACE_PC.BlazorServer.Providers
 @inject AuthUseCase AuthUseCase
+@inject NavigationManager NavigationManager;
+
 
 @code {
     protected override async Task OnInitializedAsync()
     {
         // await ((CustomeAuthenticationProvider)AuthenticationStateProvider).MaskUserAsLogout();
         await AuthUseCase.Logout();
+        NavigationManager.NavigateTo("/login");
     }
 }

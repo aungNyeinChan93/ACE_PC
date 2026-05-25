@@ -37,7 +37,7 @@ namespace ACE_PC.BlazorServer.UseCases.Auth
             }
             return default!;
         }
-
+        
         public async Task Logout()
         {
             await ((CustomeAuthenticationProvider)_AuthStateProvider).MaskUserAsLogout();
