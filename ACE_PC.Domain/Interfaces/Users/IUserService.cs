@@ -9,5 +9,7 @@ namespace ACE_PC.Domain.Interfaces.Users
     public interface IUserService
     {
         Task<ResultModel<UserResponse>> GetUserByEmail(string email);
+
+        Task<ResultModel<UsersResposne>> GetAllUses();
     }
 }

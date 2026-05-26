@@ -1,0 +1,105 @@
+﻿@page "/quotes/create"
+
+
+
+<h3 class="mb-4">Create Quote</h3>
+
+<EditForm Model="Quote" OnValidSubmit="CreateQuoteAsync">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <!-- Title -->
+    <div class="mb-3">
+        <label class="form-label">Title</label>
+        <InputText class="form-control"
+        @bind-Value="Quote.Title" />
+    </div>
+
+    <!-- Content -->
+    <div class="mb-3">
+        <label class="form-label">Content</label>
+        <InputTextArea class="form-control"
+        rows="5"
+        @bind-Value="Quote.Content" />
+    </div>
+
+    <!-- User Select -->
+    <div class="mb-3">
+        <label class="form-label">User</label>
+
+        <InputSelect class="form-select"
+        @bind-Value="Quote.UserId">
+
+            <option value="">-- Select User --</option>
+
+            @foreach (var user in Users)
+            {
+                <option value="@user.Id">
+                    @user.Name
+                </option>
+            }
+
+        </InputSelect>
+    </div>
+
+    <!-- Category Select -->
+    <div class="mb-3">
+        <label class="form-label">Category</label>
+
+        <InputSelect class="form-select"
+        @bind-Value="Quote.CategoryId">
+
+            <option value="">-- Select Category --</option>
+
+            @foreach (var category in Categories)
+            {
+                <option value="@category.Id">
+                    @category.Name
+                </option>
+            }
+
+        </InputSelect>
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+        Create Quote
+    </button>
+</EditForm>
+
+@code {
+
+    private CreateQuoteDto Quote = new();
+
+    private List<UserDto> Users = new()
+    {
+        new() { Id = 1, Name = "Aung" },
+        new() { Id = 2, Name = "Kyaw" }
+    };
+
+    private List<CategoryDto> Categories = new()
+    {
+        new() { Id = 1, Name = "Motivation" },
+        new() { Id = 2, Name = "Life" }
+    };
+
+    private async Task CreateQuoteAsync()
+    {
+        Console.WriteLine("Quote Created");
+    }
+
+    
+
+    public class UserDto
+    {
+        public int Id { get; set; }
+
+        public string Name { get; set; } = string.Empty;
+    }
+
+    public class CategoryDto
+    {
+        public int Id { get; set; }
+
+        public string Name { get; set; } = string.Empty;
+    }
+}

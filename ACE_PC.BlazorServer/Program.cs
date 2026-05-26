@@ -3,6 +3,7 @@ using ACE_PC.BlazorServer.Middleware;
 using ACE_PC.BlazorServer.Providers;
 using ACE_PC.BlazorServer.UseCases.Auth;
 using ACE_PC.BlazorServer.UseCases.Categories;
+using ACE_PC.BlazorServer.UseCases.Quotes;
 using ACE_PC.BlazorServer.UseCases.Users;
 using Blazored.Toast;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -47,6 +48,7 @@ builder.Services.AddScoped<CategoriesUseCase>();
 builder.Services.AddBlazoredToast();
 builder.Services.AddScoped<AuthUseCase>();
 builder.Services.AddScoped<UserUseCases>();
+builder.Services.AddScoped<QuoteUseCases>();
 
 
 

@@ -33,7 +33,7 @@ namespace ACE_PC.BlazorServer.Providers
             return new AuthenticationState(user);
         }
 
-        public async Task MarkUserAsAuthenticated(string token)
+        public async Task MarkUserAsAuthenticated(string token) //login
         {
             await _localStorage.SetAsync("jwtAuth", token);
 
@@ -45,7 +45,7 @@ namespace ACE_PC.BlazorServer.Providers
 
         }
 
-        public async Task MaskUserAsLogout()
+        public async Task MaskUserAsLogout()  // logout
         {
             await _localStorage.DeleteAsync("jwtAuth");
             var user = new ClaimsPrincipal(

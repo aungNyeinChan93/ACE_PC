@@ -1,0 +1,37 @@
+﻿
+
+<tr>
+    <th scope="row">@Quote.Id</th>
+    <td>@Quote.Title</td>
+    <td>@Quote.Author</td>
+    <td>
+        <button class="btn btn-sm btn-outline-primary me-2">View</button>
+        <AuthorizeView>
+            <Authorized>
+                @if (context.User.Identity!.Name == Quote.Author)
+                {
+                    <button class="btn btn-sm btn-outline-success me-2">Edit</button>
+                }
+
+                @if (context.User.IsInRole("admin"))
+                {
+                    <button class="btn btn-sm btn-outline-danger">Delete</button>
+                }
+                else if (context.User.Identity!.Name == Quote.Author)
+                {
+                    <button class="btn btn-sm btn-outline-danger">Delete</button>
+                }
+            </Authorized>
+        </AuthorizeView>
+        <AuthorizeView Roles="admin">
+            <Authorized>
+            </Authorized>
+        </AuthorizeView>
+
+    </td>
+</tr>
+
+@code {
+    [Parameter]
+    public QuotesDto Quote { get; set; } = new QuotesDto();
+}

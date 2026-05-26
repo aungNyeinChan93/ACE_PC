@@ -1,0 +1,319 @@
+﻿using ACE_PC.Database.Data;
+using ACE_PC.Domain.Dtos.Quotes;
+using ACE_PC.Domain.Entity;
+using ACE_PC.Domain.Helpers.ReqResHelper;
+using ACE_PC.Domain.Interfaces.Quotes;
+using ACE_PC.Domain.Models.Quotes;
+using Azure.Core;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace ACE_PC.BL.Services
+{
+    public class QuoteService : IQuoteService
+    {
+        private readonly AppDbContext _context;
+
+        public QuoteService(AppDbContext context)
+        {
+            _context = context;
+        }
+
+        public async Task<ResultModel<CreateQuoteResponse>> CreateAsync(CreateQuoteRequest request)
+        {
+            var responseModel = new ResultModel<CreateQuoteResponse>();
+
+            var newQuote = new Quote
+            {
+                Title = request.Title,
+                Content = request.Content,
+                CategoryId = request.CategoryId,
+                UserId = request.UserId,
+            };
+
+            await _context.Quotes.AddAsync(newQuote);
+            var result = await _context.SaveChangesAsync();
+
+            responseModel = result <= 0
+                ? ResultModel<CreateQuoteResponse>.SystemError(500, "Create Quote Fail!")
+                : ResultModel<CreateQuoteResponse>
+                .Success(200, "Create Success", new CreateQuoteResponse { Quote = newQuote });
+
+            return responseModel;
+        }
+
+
+
+        public async Task<ResultModel<QuotesResponse>> GetAllAsync()
+        {
+            var responseModel = new ResultModel<QuotesResponse>();
+
+            var quotes = await _context.Quotes
+                .Include(q => q.User)!
+                .Include(q => q.Category)!
+                .Include(q => q.Likes)!.ThenInclude(l => l.User)!
+                .Include(q => q.Comments)!.ThenInclude(c => c.User)
+                //.AsQueryable()
+                .Select(q => new QuotesDto
+                {
+                    Id = q.QuoteId,
+                    Title = q.Title,
+                    Content = q.Content,
+                    Author = q.User!.Name,
+                    Category = q.Category!.Name,
+                    Likes = q.Likes!.Select(l => new LikeDto
+                    {
+                        UserId = l.UserId,
+                        UserName = l.User!.Name
+                    }).ToList(),
+                    Comments = q.Comments!.Select(c => new CommentDto
+                    {
+                        Id = c.CommentId,
+                        Content = c.Body,
+                        UserName = c.User!.Name
+                    }).ToList()
+                })
+                .ToListAsync();
+
+
+            if (quotes is null || quotes.Count < 0)
+            {
+                responseModel = ResultModel<QuotesResponse>.ValidationError(400, "Quotes Not Found!");
+                goto skip;
+            }
+
+            var data = new QuotesResponse
+            {
+                Quotes = quotes
+            };
+
+            responseModel = ResultModel<QuotesResponse>.Success(200, "Get All Quotes", data);
+        skip:
+            return responseModel;
+        }
+
+        public async Task<ResultModel<QuotesResponse>> GetAllAsync(QuotePaginationRequest request)
+        {
+            var responseModel = new ResultModel<QuotesResponse>();
+
+
+            //pagination
+            var totalQuotes = await _context.Quotes.CountAsync();
+            var pageCount = request.PageCount;
+            var pageNumber = request.PageNumber;
+            var skip = (pageNumber - 1) * pageCount;
+
+            var totalPage = (int)Math.Ceiling(totalQuotes / (double)pageCount);
+
+            var paginationResult = new QuotesPaginationResult
+            {
+                ItemCount = totalQuotes,
+                PageCount = pageCount,
+                PageNumber = pageNumber,
+                TotalPage = totalPage,
+            };
+
+            var quotes = await _context.Quotes
+                .Include(q => q.User)!
+                .Include(q => q.Category)!
+                .Include(q => q.Likes)!.ThenInclude(l => l.User)!
+                .Include(q => q.Comments)!.ThenInclude(c => c.User)
+                .Skip(skip)
+                .Take(pageCount)
+                .Select(q => new QuotesDto
+                {
+                    Id = q.QuoteId,
+                    Content = q.Content,
+                    Title = q.Title,
+                    Author = q.User!.Name,
+                    Category = q.Category!.Name,
+                    Likes = q.Likes!.Select(l => new LikeDto
+                    {
+                        UserId = l.UserId,
+                        UserName = l.User!.Name
+                    }).ToList(),
+                    Comments = q.Comments!.Select(c => new CommentDto
+                    {
+                        Id = c.CommentId,
+                        Content = c.Body,
+                        UserName = c.User!.Name
+                    }).ToList()
+                })
+                .ToListAsync();
+
+
+            if (quotes is null || quotes.Count < 0)
+            {
+                responseModel = ResultModel<QuotesResponse>.ValidationError(400, "Quotes Not Found!");
+                goto skip;
+            }
+
+            var data = new QuotesResponse
+            {
+                Quotes = quotes,
+                PaginationResult = paginationResult
+            };
+
+            responseModel = ResultModel<QuotesResponse>.Success(200, "Get All Quotes", data);
+        skip:
+            return responseModel;
+        }
+
+        public async Task<ResultModel<QuotesResponse>> GetAllAsync(QuotePaginationRequest paginationRequest, QuoteSearchRequest searchRequest)
+        {
+            //throw new NotImplementedException();
+            var responseModel = new ResultModel<QuotesResponse>();
+
+            //pagination
+            var totalQuotes = await _context.Quotes.CountAsync();
+            var pageCount = paginationRequest.PageCount;
+            var pageNumber = paginationRequest.PageNumber;
+            var skip = (pageNumber - 1) * pageCount;
+            var totalPage = (int)Math.Ceiling(totalQuotes / (double)pageCount);
+
+            var paginationResult = new QuotesPaginationResult
+            {
+                ItemCount = totalQuotes,
+                PageCount = pageCount,
+                PageNumber = pageNumber,
+                TotalPage = totalPage,
+            };
+
+
+            // query
+            var query = _context.Quotes
+                .Include(q => q.Category)
+                .Include(q => q.User)
+                .Include(q => q.Likes)!.ThenInclude(l => l.User)
+                .Include(q => q.Comments)!.ThenInclude(c => c.User)
+                .AsQueryable();
+
+            if (searchRequest.QuoteTitle is not null)
+            {
+                query = query.Where(q => q.Title.Contains(searchRequest.QuoteTitle));
+            }
+
+            if (searchRequest.AuthorId >= 1)
+            {
+                query = query.Where(q => q.User!.UserId == searchRequest.AuthorId);
+            }
+
+            if (searchRequest.CategoryName is not null)
+            {
+                query = query.Where(q => q.Category!.Name.Contains(searchRequest.CategoryName));
+            }
+
+            if (searchRequest.AuthorName is not null)
+            {
+                query = query.Where(q => q.User!.Name.Contains(searchRequest.AuthorName));
+            }
+            if (searchRequest.CategoryId >= 1)
+            {
+                query = query.Where(q => q.CategoryId == searchRequest.CategoryId);
+            }
+
+            var quotes = await query
+                .Skip(skip)
+                .Take(pageCount)
+                .Select(q => new QuotesDto
+                {
+                    Id = q.QuoteId,
+                    Title = q.Title,
+                    Content = q.Content,
+                    Author = q.User!.Name,
+                    Category = q.Category!.Name,
+                    Likes = q.Likes!.Select(l => new LikeDto
+                    {
+                        UserId = l.UserId,
+                        UserName = l.User!.Name
+                    }).ToList(),
+                    Comments = q.Comments!.Select(c => new CommentDto
+                    {
+                        Id = c.CommentId,
+                        Content = c.Body,
+                        UserName = c.User!.Name
+                    }).ToList()
+                })
+                .ToListAsync();
+
+            if (quotes is null || quotes.Count < 0)
+            {
+                responseModel = ResultModel<QuotesResponse>.ValidationError(400, "Quotes Not Found!");
+                goto skip;
+            }
+
+            var data = new QuotesResponse
+            {
+                Quotes = quotes,
+                PaginationResult = paginationResult
+            };
+
+            responseModel = ResultModel<QuotesResponse>.Success(200, "Get All Quotes", data);
+        skip:
+            return responseModel;
+        }
+
+
+        //Update Quote
+        public async Task<ResultModel<UpdateQuoteResponse>> UpdateAsync(int id, UpdateQuoteRequest request)
+        {
+            var responseModel = new ResultModel<UpdateQuoteResponse>();
+
+            var updateQuote = await _context.Quotes.AsNoTracking()
+                .FirstOrDefaultAsync(q => q.QuoteId == id);
+
+            if (updateQuote is null)
+            {
+                responseModel = ResultModel<UpdateQuoteResponse>.ValidationError(400, "Update Quote not found!");
+                goto skip;
+            }
+
+            updateQuote.Title = request.Title;
+            updateQuote.Content = request.Content;
+            //updateQuote.User = request.User;
+            //updateQuote.Category = request.Category;
+
+
+            _context.Entry(updateQuote).State = EntityState.Modified;
+            var result = await _context.SaveChangesAsync();
+
+            responseModel = result >= 1
+                ? ResultModel<UpdateQuoteResponse>
+                .Success(200, "Update Success", new UpdateQuoteResponse { Quote = updateQuote })
+                : ResultModel<UpdateQuoteResponse>.SystemError(500, "Update Fail");
+
+        skip:
+            return responseModel;
+
+        }
+
+        // Delete
+        public async Task<ResultModel<DeleteQuoteResponse>> DeleteAsync(int id)
+        {
+            var responseModel = new ResultModel<DeleteQuoteResponse>();
+            var quote = await _context.Quotes.AsNoTracking().FirstOrDefaultAsync(q => q.QuoteId == id);
+
+            if (quote is null)
+            {
+                responseModel = ResultModel<DeleteQuoteResponse>.ValidationError(400, "Quote Not Found!");
+                goto skip;
+            }
+
+            _context.Quotes.Remove(quote);
+
+            var result = await _context.SaveChangesAsync();
+
+            responseModel = result >= 1
+                ? ResultModel<DeleteQuoteResponse>
+                .Success(200, "Delete Success", new DeleteQuoteResponse {Quote = quote })
+                : ResultModel<DeleteQuoteResponse>.SystemError(500, "Delete Fail");
+
+        skip:
+            return responseModel;
+
+        }
+    }
+}

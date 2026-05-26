@@ -1,27 +1,21 @@
-﻿using System;
+﻿using ACE_PC.Domain.Entity;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
-namespace ACE_PC.Domain.Entity
+namespace ACE_PC.Domain.Dtos.Users
 {
-    public class User
+    public class UserDto
     {
-        [Key]
         public int UserId { get; set; }
 
-        [Required]
         public string Name { get; set; } = string.Empty;
 
-        [Required]
-        public string Password { get; set; } = string.Empty;
+        //public string Password { get; set; } = string.Empty;
 
-        [Required]
         public string Email { get; set; } = string.Empty;
-
-        [ForeignKey(nameof(Role))]
-        public int RoleId { get; set; }
 
         public Role? Role { get; set; }
 
@@ -30,5 +24,8 @@ namespace ACE_PC.Domain.Entity
         public List<Comment>? Comments { get; set; }
 
         public List<Like>? Likes { get; set; }
+
+        public List<Quote>? LikeQuotes { get; set; }
+
     }
 }

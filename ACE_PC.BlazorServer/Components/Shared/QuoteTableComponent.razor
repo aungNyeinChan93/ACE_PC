@@ -1,0 +1,30 @@
+﻿
+
+<div class="container mt-4">
+    <table class="table-bordered table-striped table-hover table align-middle shadow-sm">
+        <thead class="table-primary">
+            <tr>
+                <th scope="col" style="width:5%">#</th>
+                <th scope="col" style="width:25%">Title</th>
+                <th scope="col" style="width:25%">Author</th>
+                <th scope="col" style="width:25%">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Quotes is not null)
+            {
+                @foreach (var quote in Quotes)
+                {
+                    <QuoteRecordComponent @key="quote.Id" Quote="quote" />
+                }
+            }
+           
+        </tbody>
+    </table>
+</div>
+
+
+@code {
+    [Parameter]
+    public List<QuotesDto> Quotes { get; set; }
+}
