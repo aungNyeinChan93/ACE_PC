@@ -14,45 +14,28 @@
     <div class="mb-3">
         <label class="form-label">Title</label>
         <InputText class="form-control"
-        @bind-Value="Quote.Title" />
+                   @bind-Value="Quote.Title" />
     </div>
 
     <!-- Content -->
     <div class="mb-3">
         <label class="form-label">Content</label>
         <InputTextArea class="form-control"
-        rows="5"
-        @bind-Value="Quote.Content" />
+                       rows="5"
+                       @bind-Value="Quote.Content" />
     </div>
 
     @* <InputNumber hidden @bind-Value="UserId"/> *@
-    @* <!-- User Select -->
-    <div class="mb-3">
-        <label class="form-label">User</label>
 
-        <InputSelect class="form-select"
-        @bind-Value="Quote.UserId">
-
-            <option value="">-- Select User --</option>
-
-            @foreach (var user in Users)
-            {
-                <option value="@user.Id">
-                    @user.Name
-                </option>
-            }
-
-        </InputSelect>
-    </div> *@
-
+   
     <!-- Category Select -->
     <div class="mb-3">
         <label class="form-label">Category</label>
 
         <InputSelect class="form-select"
-        @bind-Value="Quote.CategoryId">
+                     @bind-Value="Quote.CategoryId">
 
-            <option >-- Select Category --</option>
+            <option>-- Select Category --</option>
 
             @foreach (var category in Categories)
             {
@@ -71,6 +54,7 @@
 
 @code {
 
+
     public List<Category> Categories { get; set; } = [];
 
     private CreateQuoteDto Quote = new();
@@ -85,12 +69,9 @@
         {
             Console.WriteLine($"Create Success - {response.Data!.Quote!.Title} ");
             NavigationManager.NavigateTo("/quotes");
-
         }
 
     }
-
-
 
     private async Task LoadUserId()
     {
@@ -119,5 +100,10 @@
                 Categories = [.. categories];
             }
         }
+    }
+
+    private async Task DeleteQuote()
+    {
+        
     }
 }

@@ -1,4 +1,7 @@
-﻿
+﻿@inject QuoteUseCases QuoteUseCases;
+@inject NavigationManager NavigationManager;
+
+
 
 <tr>
     <th scope="row">@Quote.Id</th>
@@ -19,7 +22,7 @@
                 }
                 else if (context.User.Identity!.Name == Quote.Author)
                 {
-                    <button class="btn btn-sm btn-outline-danger">Delete</button>
+                    <button @onclick="@(() => { DeleteId = Quote.Id; Modal.Show(); })" class="btn btn-sm btn-outline-danger">Delete</button>
                 }
             </Authorized>
         </AuthorizeView>
@@ -31,7 +34,40 @@
     </td>
 </tr>
 
+
+<AppModal @ref="Modal">
+    <Title>Notification</Title>
+    <Body>
+        Are You Sure Wnat to delete
+    </Body>
+    <Footer>
+        <button type="button" @onclick="() => Modal?.Close()" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" @onclick="DeleteQuote" class="btn btn-danger">Delete </button>
+    </Footer>
+</AppModal>
+
 @code {
     [Parameter]
     public QuotesDto Quote { get; set; } = new QuotesDto();
+
+    [Parameter]
+    public EventCallback LaodQuotes { get; set; }
+
+    public AppModal? Modal { get; set; }
+
+    public int DeleteId { get; set; }
+
+    private async Task DeleteQuote()
+    {   
+        Console.WriteLine("Delete Quote");
+        var response = await QuoteUseCases.DeleteAsync(DeleteId);
+        if (response.IsSuccess)
+        {
+            Console.WriteLine($"{response.ResponseMessage}");
+            Modal?.Close();
+            await LaodQuotes.InvokeAsync();
+        }
+    }
+
+    
 }

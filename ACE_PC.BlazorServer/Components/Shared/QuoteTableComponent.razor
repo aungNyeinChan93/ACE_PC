@@ -15,7 +15,7 @@
             {
                 @foreach (var quote in Quotes)
                 {
-                    <QuoteRecordComponent @key="quote.Id" Quote="quote" />
+                    <QuoteRecordComponent LaodQuotes="LaodQuotes" @key="quote.Id" Quote="quote" />
                 }
             }
            
@@ -26,5 +26,8 @@
 
 @code {
     [Parameter]
-    public List<QuotesDto> Quotes { get; set; }
+    public List<QuotesDto> Quotes { get; set; } = [];
+
+    [Parameter]
+    public EventCallback LaodQuotes { get; set; }
 }

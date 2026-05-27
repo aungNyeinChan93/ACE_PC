@@ -60,5 +60,12 @@ namespace ACE_PC.BlazorServer.UseCases.Quotes
             }
             return default!;
         }
+
+        //Delete
+        public async Task<ResultModel<DeleteQuoteResponse>> DeleteAsync(int id)
+        {
+            var response = await _httpClient.DeleteFromJsonAsync<ResultModel<DeleteQuoteResponse>>($"/api/quotes/{id}");
+            return response!;
+        }
     }
 }

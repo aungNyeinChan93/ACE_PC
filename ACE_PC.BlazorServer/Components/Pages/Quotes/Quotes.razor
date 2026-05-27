@@ -12,8 +12,11 @@
             <i class="bi bi-plus-lg"></i> Create
         </button>
     </div>
-    <QuoteTableComponent Quotes="MyQuotes" /> 
+    <QuoteTableComponent LaodQuotes="LoadQuotes" Quotes="MyQuotes" />
 </section>
+
+
+
 
 
 <br />
@@ -23,6 +26,8 @@
 </pre>
 
 @code {
+
+    
     public List<QuotesDto> MyQuotes { get; set; } = [];
 
     protected override async Task OnInitializedAsync()
@@ -31,7 +36,7 @@
 
     }
 
-    private async Task LoadQuotes()
+    public async Task LoadQuotes()
     {
         var response = await QuoteUseCases.GetAllQuotes();
         if (response.IsSuccess)
@@ -39,7 +44,7 @@
             var quotes = response.Data!.Quotes;
             if (quotes is not null)
             {
-                MyQuotes.Clear();
+                // MyQuotes.Clear();
                 MyQuotes = [.. quotes];
             }
         }
