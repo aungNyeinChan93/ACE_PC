@@ -169,7 +169,6 @@ namespace ACE_PC.BL.Services
         //GetAllAsync (pagination ,Search)
         public async Task<ResultModel<QuotesResponse>> GetAllAsync(QuotePaginationRequest paginationRequest, QuoteSearchRequest searchRequest)
         {
-            //throw new NotImplementedException();
             var responseModel = new ResultModel<QuotesResponse>();
 
             //pagination

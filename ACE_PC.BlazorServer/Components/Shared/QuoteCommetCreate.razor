@@ -1,4 +1,7 @@
-﻿<!-- Create Comment Box -->
+﻿@inject CommentUseCases CommentUseCases;
+
+
+<!-- Create Comment Box -->
 <div class="card rounded-4 mb-4 border-0 shadow-sm">
     <div class="card-body">
 
@@ -12,32 +15,36 @@
 
             <!-- Input Area -->
             <div class="flex-grow-1">
+                <EditForm Model="Comment" FormName="CreateComment" OnValidSubmit="AddComment">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+                    <textarea class="form-control bg-light rounded-4 border-0 p-3"
+                              rows="3"
+                              placeholder="Write a comment..."
+                              @bind="Comment.Content"></textarea>
+                    <p>
+                        <ValidationMessage For="() => Comment.Content" />
+                    </p>
 
-                <textarea class="form-control bg-light rounded-4 border-0 p-3"
-                          rows="3"
-                          placeholder="Write a comment..."
-                          @bind="NewComment"></textarea>
+                    <div class="d-flex justify-content-end mt-3">
+                        <button type="submit" class="btn btn-primary rounded-pill px-4"
+                                disabled="@IsPosting">
 
-                <div class="d-flex justify-content-end mt-3">
+                            @if (IsPosting)
+                            {
+                                <span class="spinner-border spinner-border-sm me-2"></span>
+                                @* Posting... *@
+                            }
+                            else
+                            {
+                                <i class="bi bi-send me-2"></i>
+                                @* Post Comment *@
+                            }
 
-                    <button class="btn btn-primary rounded-pill px-4"
-                            @onclick="AddComment"
-                            disabled="@IsPosting">
+                        </button>
 
-                        @if (IsPosting)
-                        {
-                            <span class="spinner-border spinner-border-sm me-2"></span>
-                            @* Posting... *@
-                        }
-                        else
-                        {
-                            <i class="bi bi-send me-2"></i>
-                            @* Post Comment *@
-                        }
-
-                    </button>
-
-                </div>
+                    </div>
+                </EditForm>
 
             </div>
         </div>
@@ -48,42 +55,48 @@
 @code {
 
 
+    [Parameter]
+    public QuotesDto Quote { get; set; } = new();
 
-    private string NewComment = "";
+    [Parameter]
+    public EventCallback LoadQuote { get; set; }
+
+    public CommentDto Comment { get; set; } = new();
+
     private bool IsPosting = false;
 
-    private List<CommentVm> Comments = new()
-    {
-        new CommentVm { UserName = "john", Content = "Nice post!", Time = "2h ago" },
-        new CommentVm { UserName = "alice", Content = "Very helpful 👍", Time = "1d ago" }
-    };
 
     private async Task AddComment()
     {
-        if (string.IsNullOrWhiteSpace(NewComment))
+
+        if (string.IsNullOrWhiteSpace(Comment.Content))
             return;
 
         IsPosting = true;
 
-        // simulate API delay
-        await Task.Delay(800);
+        Console.WriteLine(Comment.Content);
+        Console.WriteLine(Quote.AuthorId);
+        Console.WriteLine(Quote.Id);
 
-        Comments.Insert(0, new CommentVm
+        var request = new CreateCommentRequest()
         {
-            UserName = "current_user",
-            Content = NewComment,
-            Time = "Just now"
-        });
+            Body = Comment.Content,
+            QuoteId = Quote.Id,
+            UserId = Quote.AuthorId
+        };
 
-        NewComment = "";
+        var response = await CommentUseCases.CreateAsync(request);
+
+        if (response.IsSuccess)
+        {
+            Console.WriteLine(response.ResponseMessage);
+            await this.LoadQuote.InvokeAsync();
+        }
+
+        Comment.Content = "";
 
         IsPosting = false;
     }
 
-    public class CommentVm
-    {
-        public string UserName { get; set; } = "";
-        public string Content { get; set; } = "";
-        public string Time { get; set; } = "";
-    }
+ 
 }

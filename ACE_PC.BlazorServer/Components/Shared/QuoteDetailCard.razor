@@ -1,4 +1,6 @@
-﻿<div class="container py-5">
+﻿
+
+<div class="container py-5">
     <div class="row justify-content-center">
 
         <!-- Blog Card -->
@@ -153,7 +155,7 @@
         <div class="p-4">
             @if (IsComment)
             {
-                <QuoteCommetCreate />
+                <QuoteCommetCreate Quote="Quote" LoadQuote="LoadQuote" />
             }
         </div>
 
@@ -168,6 +170,9 @@
     public QuotesDto Quote { get; set; } = new();
 
     public bool IsComment { get; set; } = false;
+
+    [Parameter]
+    public EventCallback LoadQuote { get; set; }
 
 
 

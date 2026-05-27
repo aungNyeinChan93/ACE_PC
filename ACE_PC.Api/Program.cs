@@ -3,6 +3,7 @@ using ACE_PC.BL.Services;
 using ACE_PC.Database.Data;
 using ACE_PC.Domain.Interfaces.Auth;
 using ACE_PC.Domain.Interfaces.Categories;
+using ACE_PC.Domain.Interfaces.Comments;
 using ACE_PC.Domain.Interfaces.Quotes;
 using ACE_PC.Domain.Interfaces.Users;
 using Microsoft.EntityFrameworkCore;
@@ -24,6 +25,7 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IQuoteService, QuoteService>();
+builder.Services.AddScoped<ICommentService, CommentService>();
 
 builder.Services.AddCors(options =>
 {
