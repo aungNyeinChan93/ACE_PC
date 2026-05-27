@@ -12,17 +12,15 @@
             <i class="bi bi-plus-lg"></i> Create
         </button>
     </div>
+   
     <QuoteTableComponent LaodQuotes="LoadQuotes" Quotes="MyQuotes" />
 </section>
-
-
-
 
 
 <br />
 <hr />
 <pre>
-     @(JsonConvert.SerializeObject(MyQuotes, Formatting.Indented))  
+     @(JsonConvert.SerializeObject(MyQuotes, Formatting.Indented))
 </pre>
 
 @code {

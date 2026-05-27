@@ -1,0 +1,125 @@
+﻿@page "/quotes/edit/{quoteId:int}"
+@inject AuthenticationStateProvider AuthenticationStateProvider;
+@inject CategoriesUseCase CategoriesUseCase;
+@inject QuoteUseCases QuoteUseCases;
+@inject NavigationManager NavigationManager;
+
+@using ACE_PC.Domain.Models.Quotes
+<h3 class="mb-4">Update Quote</h3>
+
+<EditForm Model="Quote" OnValidSubmit="UpdateQuote">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <!-- Title -->
+    <div class="mb-3">
+        <label class="form-label">Title</label>
+        <InputText class="form-control"
+                   @bind-Value="Quote.Title" />
+    </div>
+
+    <!-- Content -->
+    <div class="mb-3">
+        <label class="form-label">Content</label>
+        <InputTextArea class="form-control"
+                       rows="5"
+                       @bind-Value="Quote.Content" />
+    </div>
+
+    @* <InputNumber hidden @bind-Value="UserId"/> *@
+    <input hidden value="@Quote.AuthorId" />
+
+   
+    <!-- Category Select -->
+    <div class="mb-3">
+        <label class="form-label">Category</label>
+
+        <InputSelect class="form-select"
+                     @bind-Value="Quote.CategoryId">
+
+            <option>-- Select Category --</option>
+
+            @foreach (var category in Categories)
+            {
+                <option value="@category.CategoryId">
+                    @category.Name
+                </option>
+            }
+
+        </InputSelect>
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+        Create Quote
+    </button>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int QuoteId { get; set; }
+
+    public List<Category> Categories { get; set; } = [];
+
+    private QuotesDto Quote = new();
+
+    public int UserId { get; set; }
+
+
+    private async Task UpdateQuote()
+    {
+        var request = new UpdateQuoteRequest()
+        {
+            Title = Quote.Title,
+            CategoryId = Quote.CategoryId,
+            Content = Quote.Content
+        };
+        var response = await QuoteUseCases.UpdateAsync(QuoteId,request);
+        if (response.IsSuccess)
+        {
+            Console.WriteLine($"{response.ResponseMessage}");
+            NavigationManager.NavigateTo("/quotes");
+        }
+    }
+
+    private async Task LoadUserId()
+    {
+        var state = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var authUser = state.User;
+        var userId = int.Parse(authUser.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        UserId = userId;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        // return base.OnInitializedAsync();
+        await this.LoadUserId();
+        await this.LaodQuote();
+        await this.LoadCategories();
+    }
+
+    private async Task LoadCategories()
+    {
+        var response = await CategoriesUseCase.GetAllAsync();
+        if (response.IsSuccess)
+        {
+            var categories = response.Data!.Categoreis;
+            if (categories is not null || categories!.Count > 0)
+            {
+                Categories = [.. categories];
+            }
+        }
+    }
+
+    private async Task LaodQuote()
+    {
+        var response = await QuoteUseCases.GetByIdAsync(QuoteId);
+        if (response.IsSuccess)
+        {
+            var quote = response.Data!.QuoteDto;
+            Quote = quote;
+        }
+
+    }
+
+    
+}

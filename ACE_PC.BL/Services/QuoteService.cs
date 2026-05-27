@@ -47,7 +47,7 @@ namespace ACE_PC.BL.Services
         }
 
 
-
+        //GetAll
         public async Task<ResultModel<QuotesResponse>> GetAllAsync()
         {
             var responseModel = new ResultModel<QuotesResponse>();
@@ -96,6 +96,8 @@ namespace ACE_PC.BL.Services
             return responseModel;
         }
 
+
+        //GetAllAsync (Pagination)
         public async Task<ResultModel<QuotesResponse>> GetAllAsync(QuotePaginationRequest request)
         {
             var responseModel = new ResultModel<QuotesResponse>();
@@ -163,6 +165,8 @@ namespace ACE_PC.BL.Services
             return responseModel;
         }
 
+
+        //GetAllAsync (pagination ,Search)
         public async Task<ResultModel<QuotesResponse>> GetAllAsync(QuotePaginationRequest paginationRequest, QuoteSearchRequest searchRequest)
         {
             //throw new NotImplementedException();
@@ -274,6 +278,7 @@ namespace ACE_PC.BL.Services
 
             updateQuote.Title = request.Title;
             updateQuote.Content = request.Content;
+            updateQuote.CategoryId = request.CategoryId;
             //updateQuote.User = request.User;
             //updateQuote.Category = request.Category;
 
@@ -309,12 +314,67 @@ namespace ACE_PC.BL.Services
 
             responseModel = result >= 1
                 ? ResultModel<DeleteQuoteResponse>
-                .Success(200, "Delete Success", new DeleteQuoteResponse {Quote = quote })
+                .Success(200, "Delete Success", new DeleteQuoteResponse { Quote = quote })
                 : ResultModel<DeleteQuoteResponse>.SystemError(500, "Delete Fail");
 
         skip:
             return responseModel;
 
         }
+
+
+        //GetByID
+        public async Task<ResultModel<QuoteResponse>> GetByIdAsync(int id)
+        {
+            var responseModel = new ResultModel<QuoteResponse>();
+            var quote = await _context.Quotes.AsNoTracking()
+                .Include(q => q.Category)
+                .Include(q => q.User)
+                .Include(q => q.Comments)!.ThenInclude(c => c.User)
+                .Include(q => q.Likes)!.ThenInclude(l => l.User)
+                .Where(q => q.QuoteId == id)
+                .Select(q => new QuotesDto
+                {
+                    Id = q.QuoteId,
+                    Title = q.Title,
+                    Content = q.Content,
+                    Author = q.User!.Name,
+                    Category = q.Category!.Name,
+                    AuthorId = q.UserId,
+                    CategoryId = q.CategoryId,
+                    Likes = q.Likes!.Select(l => new LikeDto
+                    {
+                        UserId = l.UserId,
+                        UserName = l.User!.Name
+                    }).ToList(),
+                    Comments = q.Comments!.Select(c => new CommentDto
+                    {
+                        Id = c.CommentId,
+                        Content = c.Body,
+                        UserName = c.User!.Name
+                    }).ToList()
+                })
+                .FirstOrDefaultAsync();
+
+            if (quote is null)
+            {
+                responseModel = ResultModel<QuoteResponse>.ValidationError(400, "Quote Not Found!");
+                goto skip;
+            }
+
+
+            var data = new QuoteResponse
+            {
+                QuoteDto = quote!
+            };
+
+            responseModel = ResultModel<QuoteResponse>.Success(200, "Get Quote", data);
+
+        skip:
+            return responseModel;
+
+        }
+
+
     }
 }

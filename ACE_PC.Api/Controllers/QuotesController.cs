@@ -171,5 +171,29 @@ namespace ACE_PC.Api.Controllers
 
             return Ok(response);
         }
+
+        //GetById
+        [HttpGet("{id:int}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var response = await _quoteService.GetByIdAsync(id);
+            if (response.IsError)
+            {
+                if (response.ResponseType == EnumResponseType.Pending)
+                {
+                    return StatusCode(102, response);
+                }
+                if (response.ResponseType == EnumResponseType.ValidationError)
+                {
+                    return StatusCode(400, response);
+                }
+                if (response.ResponseType == EnumResponseType.SystemError)
+                {
+                    return StatusCode(500, response);
+                }
+            }
+
+            return Ok(response);
+        }
     }
 }

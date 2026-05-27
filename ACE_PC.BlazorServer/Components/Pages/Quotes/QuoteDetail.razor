@@ -1,0 +1,40 @@
+﻿@page "/quotes/detail/{quoteId:int}"
+@inject QuoteUseCases QuoteUseCases
+
+
+@if (Quote is not null)
+{
+    <QuoteDetailCard Quote="Quote" />
+
+}
+else
+{
+    <p>Loading ...</p>
+}
+
+
+@code {
+    [Parameter]
+    public int QuoteId { get; set; }
+
+    public QuotesDto Quote { get; set; } = new();
+
+
+    private async Task LoadQuote()
+    {
+        var response = await QuoteUseCases.GetByIdAsync(QuoteId);
+        if (response.IsSuccess)
+        {
+            var quote = response.Data!.QuoteDto;
+            if (quote is not null)
+            {
+                Quote = quote;
+            }
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await this.LoadQuote();
+    }
+}

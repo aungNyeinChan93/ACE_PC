@@ -10,6 +10,8 @@ namespace ACE_PC.Domain.Interfaces.Quotes
     public interface IQuoteService
     {
         Task<ResultModel<QuotesResponse>> GetAllAsync();
+
+        Task<ResultModel<QuoteResponse>> GetByIdAsync(int id);
         Task<ResultModel<QuotesResponse>> GetAllAsync(QuotePaginationRequest request);
         Task<ResultModel<QuotesResponse>> GetAllAsync(QuotePaginationRequest paginationRequest,QuoteSearchRequest searchRequest);
         Task<ResultModel<CreateQuoteResponse>> CreateAsync(CreateQuoteRequest request);

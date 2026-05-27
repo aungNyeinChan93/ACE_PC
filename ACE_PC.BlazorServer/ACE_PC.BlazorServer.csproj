@@ -8,11 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ACE_PC.Api\ACE_PC.Api.csproj" />
-    <ProjectReference Include="..\ACE_PC.Domain\ACE_PC.Domain.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Folder Include="ClientModels\" />
   </ItemGroup>
 
@@ -20,6 +15,11 @@
     <PackageReference Include="ANM.Blazored.Toast" Version="0.1.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="Sotsera.Blazor.Toaster" Version="3.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ACE_PC.Api\ACE_PC.Api.csproj" />
+    <ProjectReference Include="..\ACE_PC.Domain\ACE_PC.Domain.csproj" />
   </ItemGroup>
 
 </Project>

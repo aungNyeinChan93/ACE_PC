@@ -13,6 +13,8 @@ namespace ACE_PC.Domain.Models.Quotes
 
         public string Content { get; set; } = string.Empty;
 
+        public int CategoryId { get; set; }
+
         //public User? User { get; set; }
 
         //public Category? Category { get; set; }

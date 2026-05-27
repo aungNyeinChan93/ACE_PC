@@ -25,14 +25,16 @@ namespace ACE_PC.BlazorServer.UseCases.Quotes
 
             if (token is not null)
             {
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer",token);
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
             }
         }
 
+
+        //All
         public async Task<ResultModel<QuotesResponse>> GetAllQuotes()
         {
             await this.SetAuthHeader();
-            var response =await _httpClient.GetFromJsonAsync<ResultModel<QuotesResponse>>("/api/quotes");
+            var response = await _httpClient.GetFromJsonAsync<ResultModel<QuotesResponse>>("/api/quotes");
             return response!;
         }
 
@@ -49,14 +51,14 @@ namespace ACE_PC.BlazorServer.UseCases.Quotes
                 UserId = dto.UserId
             };
 
-            var response = await _httpClient.PostAsJsonAsync("/api/quotes",modal);
+            var response = await _httpClient.PostAsJsonAsync("/api/quotes", modal);
             if (response.IsSuccessStatusCode)
             {
                 var resStr = await response.Content.ReadAsStringAsync();
-                var result = JsonConvert.DeserializeObject < ResultModel<CreateQuoteResponse>>(resStr);
+                var result = JsonConvert.DeserializeObject<ResultModel<CreateQuoteResponse>>(resStr);
                 if (result is null) return default!;
                 return result;
-                
+
             }
             return default!;
         }
@@ -64,8 +66,31 @@ namespace ACE_PC.BlazorServer.UseCases.Quotes
         //Delete
         public async Task<ResultModel<DeleteQuoteResponse>> DeleteAsync(int id)
         {
+            await this.SetAuthHeader();
             var response = await _httpClient.DeleteFromJsonAsync<ResultModel<DeleteQuoteResponse>>($"/api/quotes/{id}");
             return response!;
+        }
+
+        //getById
+        public async Task<ResultModel<QuoteResponse>> GetByIdAsync(int id)
+        {
+            await this.SetAuthHeader();
+            var response = await _httpClient.GetFromJsonAsync<ResultModel<QuoteResponse>>($"/api/quotes/{id}");
+            return response!;
+        }
+
+        //UpdateQuote
+        public async Task<ResultModel<UpdateQuoteResponse>> UpdateAsync(int id,UpdateQuoteRequest request)
+        {
+            await this.SetAuthHeader();
+            var response = await _httpClient.PutAsJsonAsync($"/api/quotes/{id}",request);
+            if (response.IsSuccessStatusCode)
+            {
+                var resStr =await response.Content.ReadAsStringAsync();
+                var result = JsonConvert.DeserializeObject<ResultModel<UpdateQuoteResponse>>(resStr);
+                return result!;
+            }
+            return default!;
         }
     }
 }

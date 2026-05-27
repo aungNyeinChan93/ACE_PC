@@ -16,6 +16,7 @@ namespace ACE_PC.Domain.Entity
 
         public Quote? Quote { get; set; }
 
+
         [ForeignKey(nameof(User))]
         public int UserId { get; set; }
 
