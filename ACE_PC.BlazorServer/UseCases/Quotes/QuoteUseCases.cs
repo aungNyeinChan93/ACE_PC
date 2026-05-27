@@ -1,6 +1,8 @@
-﻿using ACE_PC.Domain.Helpers.ReqResHelper;
+﻿using ACE_PC.BlazorServer.Dtos.Quotes;
+using ACE_PC.Domain.Helpers.ReqResHelper;
 using ACE_PC.Domain.Models.Quotes;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+using Newtonsoft.Json;
 using System.ClientModel.Primitives;
 using System.Net.Http.Headers;
 
@@ -34,5 +36,29 @@ namespace ACE_PC.BlazorServer.UseCases.Quotes
             return response!;
         }
 
+        //CreateQuote
+        public async Task<ResultModel<CreateQuoteResponse>> CreateQuote(CreateQuoteDto dto)
+        {
+            await this.SetAuthHeader();
+
+            var modal = new CreateQuoteRequest
+            {
+                Title = dto.Title,
+                Content = dto.Content,
+                CategoryId = dto.CategoryId,
+                UserId = dto.UserId
+            };
+
+            var response = await _httpClient.PostAsJsonAsync("/api/quotes",modal);
+            if (response.IsSuccessStatusCode)
+            {
+                var resStr = await response.Content.ReadAsStringAsync();
+                var result = JsonConvert.DeserializeObject < ResultModel<CreateQuoteResponse>>(resStr);
+                if (result is null) return default!;
+                return result;
+                
+            }
+            return default!;
+        }
     }
 }

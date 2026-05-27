@@ -21,9 +21,11 @@ namespace ACE_PC.BL.Services
             _context = context;
         }
 
+        //GetAllUses
         public async Task<ResultModel<UsersResposne>> GetAllUses()
         {
             var responseModel = new ResultModel<UsersResposne>();
+
             var users = await _context.Users.AsNoTracking()
                 .Include(u => u.Role)!
                 .Include(u => u.Quotes)!
@@ -54,7 +56,7 @@ namespace ACE_PC.BL.Services
                 UserDto = users
             };
 
-            responseModel = ResultModel<UsersResposne>.Success(200,"Get All Uses");
+            responseModel = ResultModel<UsersResposne>.Success(200,"Get All Uses",data);
 
             
 
@@ -62,6 +64,7 @@ namespace ACE_PC.BL.Services
             return responseModel;
         }
 
+        // GetUserByEmail
         public async Task<ResultModel<UserResponse>> GetUserByEmail(string email)
         {
             var responseModel =new ResultModel<UserResponse>();

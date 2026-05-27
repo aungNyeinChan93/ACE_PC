@@ -1,6 +1,8 @@
 ﻿@page "/quotes/create"
-
-
+@inject AuthenticationStateProvider AuthenticationStateProvider;
+@inject CategoriesUseCase CategoriesUseCase;
+@inject QuoteUseCases QuoteUseCases;
+@inject NavigationManager NavigationManager;
 
 <h3 class="mb-4">Create Quote</h3>
 
@@ -23,7 +25,8 @@
         @bind-Value="Quote.Content" />
     </div>
 
-    <!-- User Select -->
+    @* <InputNumber hidden @bind-Value="UserId"/> *@
+    @* <!-- User Select -->
     <div class="mb-3">
         <label class="form-label">User</label>
 
@@ -40,7 +43,7 @@
             }
 
         </InputSelect>
-    </div>
+    </div> *@
 
     <!-- Category Select -->
     <div class="mb-3">
@@ -49,11 +52,11 @@
         <InputSelect class="form-select"
         @bind-Value="Quote.CategoryId">
 
-            <option value="">-- Select Category --</option>
+            <option >-- Select Category --</option>
 
             @foreach (var category in Categories)
             {
-                <option value="@category.Id">
+                <option value="@category.CategoryId">
                     @category.Name
                 </option>
             }
@@ -68,38 +71,53 @@
 
 @code {
 
+    public List<Category> Categories { get; set; } = [];
+
     private CreateQuoteDto Quote = new();
 
-    private List<UserDto> Users = new()
-    {
-        new() { Id = 1, Name = "Aung" },
-        new() { Id = 2, Name = "Kyaw" }
-    };
-
-    private List<CategoryDto> Categories = new()
-    {
-        new() { Id = 1, Name = "Motivation" },
-        new() { Id = 2, Name = "Life" }
-    };
+    public int UserId { get; set; }
 
     private async Task CreateQuoteAsync()
     {
         Console.WriteLine("Quote Created");
+        var response = await QuoteUseCases.CreateQuote(Quote);
+        if (response.IsSuccess)
+        {
+            Console.WriteLine($"Create Success - {response.Data!.Quote!.Title} ");
+            NavigationManager.NavigateTo("/quotes");
+
+        }
+
     }
 
-    
 
-    public class UserDto
+
+    private async Task LoadUserId()
     {
-        public int Id { get; set; }
-
-        public string Name { get; set; } = string.Empty;
+        var state = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var authUser = state.User;
+        var userId = int.Parse(authUser.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        UserId = userId;
+        Quote.UserId = UserId;
     }
 
-    public class CategoryDto
+    protected override async Task OnInitializedAsync()
     {
-        public int Id { get; set; }
+        // return base.OnInitializedAsync();
+        await this.LoadUserId();
+        await this.LoadCategories();
+    }
 
-        public string Name { get; set; } = string.Empty;
+    private async Task LoadCategories()
+    {
+        var response = await CategoriesUseCase.GetAllAsync();
+        if (response.IsSuccess)
+        {
+            var categories = response.Data!.Categoreis;
+            if (categories is not null || categories!.Count > 0)
+            {
+                Categories = [.. categories];
+            }
+        }
     }
 }

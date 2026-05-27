@@ -39,5 +39,29 @@ namespace ACE_PC.Api.Controllers
             }
             return Ok(response);
         }
+
+
+        //GetAllUsers
+        [HttpGet]
+        public async Task<IActionResult> GetAllUsers()
+        {
+            var response = await _userService.GetAllUses();
+            if (response.IsError)
+            {
+                if (response.ResponseType == EnumResponseType.Pending)
+                {
+                    return StatusCode(102, response);
+                }
+                if (response.ResponseType == EnumResponseType.ValidationError)
+                {
+                    return StatusCode(400, response);
+                }
+                if (response.ResponseType == EnumResponseType.SystemError)
+                {
+                    return StatusCode(500, response);
+                }
+            }
+            return Ok(response);
+        }
     }
 }
