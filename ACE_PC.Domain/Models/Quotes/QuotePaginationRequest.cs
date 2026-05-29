@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ACE_PC.Domain.Models.Quotes
 {
-    public class QuotePaginationRequest
+    public class    QuotePaginationRequest
     {
         public int PageCount { get; set; } = 10;
 

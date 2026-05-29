@@ -5,6 +5,7 @@ using ACE_PC.Domain.Helpers.ReqResHelper;
 using ACE_PC.Domain.Interfaces.Quotes;
 using ACE_PC.Domain.Models.Quotes;
 using Azure.Core;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -167,13 +168,20 @@ namespace ACE_PC.BL.Services
 
 
         //GetAllAsync (pagination ,Search)
-        public async Task<ResultModel<QuotesResponse>> GetAllAsync(QuotePaginationRequest paginationRequest, QuoteSearchRequest searchRequest)
+        public async Task<ResultModel<QuotesResponse>> GetAllAsync(
+            [FromQuery]QuotePaginationRequest paginationRequest,
+            [FromQuery]QuoteSearchRequest searchRequest)
         {
             var responseModel = new ResultModel<QuotesResponse>();
 
+            // Ensure we provide default instantiation if query didn't populate them
+            paginationRequest ??= new QuotePaginationRequest();
+            searchRequest ??= new QuoteSearchRequest();
+
+
             //pagination
             var totalQuotes = await _context.Quotes.CountAsync();
-            var pageCount = paginationRequest.PageCount;
+            var pageCount = paginationRequest.PageCount;    
             var pageNumber = paginationRequest.PageNumber;
             var skip = (pageNumber - 1) * pageCount;
             var totalPage = (int)Math.Ceiling(totalQuotes / (double)pageCount);
@@ -195,9 +203,21 @@ namespace ACE_PC.BL.Services
                 .Include(q => q.Comments)!.ThenInclude(c => c.User)
                 .AsQueryable();
 
-            if (searchRequest.QuoteTitle is not null)
+            //if (searchRequest.QuoteTitle is not null)
+            //{
+            //    query = query.Where(q => q.Title.Contains(searchRequest.QuoteTitle));
+            //}
+            //if (searchRequest.AuthorName is not null)
+            //{
+            //    query = query.Where(q => q.User!.Name.Contains(searchRequest.AuthorName));
+            //}
+
+            if (!string.IsNullOrWhiteSpace(searchRequest.QuoteTitle) || !string.IsNullOrWhiteSpace(searchRequest.AuthorName))
             {
-                query = query.Where(q => q.Title.Contains(searchRequest.QuoteTitle));
+                query = query.Where(q =>
+                    (searchRequest.QuoteTitle != null && q.Title.Contains(searchRequest.QuoteTitle)) ||
+                    (searchRequest.AuthorName != null && q.User!.Name.Contains(searchRequest.AuthorName))
+                );
             }
 
             if (searchRequest.AuthorId >= 1)
@@ -210,10 +230,7 @@ namespace ACE_PC.BL.Services
                 query = query.Where(q => q.Category!.Name.Contains(searchRequest.CategoryName));
             }
 
-            if (searchRequest.AuthorName is not null)
-            {
-                query = query.Where(q => q.User!.Name.Contains(searchRequest.AuthorName));
-            }
+            
             if (searchRequest.CategoryId >= 1)
             {
                 query = query.Where(q => q.CategoryId == searchRequest.CategoryId);

@@ -2,6 +2,7 @@
 using ACE_PC.Domain.Helpers.ReqResHelper;
 using ACE_PC.Domain.Models.Quotes;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+using Microsoft.AspNetCore.WebUtilities;
 using Newtonsoft.Json;
 using System.ClientModel.Primitives;
 using System.Net.Http.Headers;
@@ -80,17 +81,46 @@ namespace ACE_PC.BlazorServer.UseCases.Quotes
         }
 
         //UpdateQuote
-        public async Task<ResultModel<UpdateQuoteResponse>> UpdateAsync(int id,UpdateQuoteRequest request)
+        public async Task<ResultModel<UpdateQuoteResponse>> UpdateAsync(int id, UpdateQuoteRequest request)
         {
             await this.SetAuthHeader();
-            var response = await _httpClient.PutAsJsonAsync($"/api/quotes/{id}",request);
+            var response = await _httpClient.PutAsJsonAsync($"/api/quotes/{id}", request);
             if (response.IsSuccessStatusCode)
             {
-                var resStr =await response.Content.ReadAsStringAsync();
+                var resStr = await response.Content.ReadAsStringAsync();
                 var result = JsonConvert.DeserializeObject<ResultModel<UpdateQuoteResponse>>(resStr);
                 return result!;
             }
             return default!;
+        }
+
+
+        //getBySearchKey
+        public async Task<ResultModel<QuotesResponse>> GetBySearchKey(QuoteSearchRequest searchReq, QuotePaginationRequest? paginationReq = default)
+        {
+            await this.SetAuthHeader();
+
+            // Fallback to defaults if paginationReq is null to prevent 400 Bad Request
+            int pageNumber = paginationReq?.PageNumber ?? 1;
+            int pageCount = paginationReq?.PageCount ?? 10;
+
+            var queryParams = new Dictionary<string, string?>
+            {
+                // Guaranteed to pass valid integers now
+                { "PageNumber", pageNumber.ToString() },
+                { "PageCount", pageCount.ToString() },
+
+                // Search Parameters
+                { "QuoteTitle", string.IsNullOrWhiteSpace(searchReq.QuoteTitle) ? null : searchReq.QuoteTitle },
+                { "AuthorId", searchReq.AuthorId >= 1 ? searchReq.AuthorId.ToString() : null },
+                { "AuthorName", string.IsNullOrWhiteSpace(searchReq.AuthorName) ? null : searchReq.AuthorName },
+                { "CategoryId", searchReq.CategoryId >= 1 ? searchReq.CategoryId.ToString() : null },
+                { "CategoryName", string.IsNullOrWhiteSpace(searchReq.CategoryName) ? null : searchReq.CategoryName }
+            };
+            string requestUri = QueryHelpers.AddQueryString("/api/quotes/search", queryParams);
+            var response = await _httpClient.GetFromJsonAsync<ResultModel<QuotesResponse>>(requestUri);
+            Console.WriteLine($"Requesting URL: {requestUri}");
+            return response ?? ResultModel<QuotesResponse>.ValidationError(500, "Received empty response from server.");
         }
     }
 }
