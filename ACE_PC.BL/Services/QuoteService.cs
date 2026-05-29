@@ -71,7 +71,9 @@ namespace ACE_PC.BL.Services
                         UserId = l.UserId,
                         UserName = l.User!.Name
                     }).ToList(),
-                    Comments = q.Comments!.Select(c => new CommentDto
+                    Comments = q.Comments!
+                    .OrderByDescending(c => c.CommentId) // or c.CreatedOn
+                    .Select(c => new CommentDto
                     {
                         Id = c.CommentId,
                         Content = c.Body,
@@ -139,7 +141,9 @@ namespace ACE_PC.BL.Services
                         UserId = l.UserId,
                         UserName = l.User!.Name
                     }).ToList(),
-                    Comments = q.Comments!.Select(c => new CommentDto
+                    Comments = q.Comments!
+                    .OrderByDescending(c => c.CommentId) // or c.CreatedOn
+                    .Select(c => new CommentDto
                     {
                         Id = c.CommentId,
                         Content = c.Body,
@@ -169,8 +173,8 @@ namespace ACE_PC.BL.Services
 
         //GetAllAsync (pagination ,Search)
         public async Task<ResultModel<QuotesResponse>> GetAllAsync(
-            [FromQuery]QuotePaginationRequest paginationRequest,
-            [FromQuery]QuoteSearchRequest searchRequest)
+            [FromQuery] QuotePaginationRequest paginationRequest,
+            [FromQuery] QuoteSearchRequest searchRequest)
         {
             var responseModel = new ResultModel<QuotesResponse>();
 
@@ -181,7 +185,7 @@ namespace ACE_PC.BL.Services
 
             //pagination
             var totalQuotes = await _context.Quotes.CountAsync();
-            var pageCount = paginationRequest.PageCount;    
+            var pageCount = paginationRequest.PageCount;
             var pageNumber = paginationRequest.PageNumber;
             var skip = (pageNumber - 1) * pageCount;
             var totalPage = (int)Math.Ceiling(totalQuotes / (double)pageCount);
@@ -230,7 +234,7 @@ namespace ACE_PC.BL.Services
                 query = query.Where(q => q.Category!.Name.Contains(searchRequest.CategoryName));
             }
 
-            
+
             if (searchRequest.CategoryId >= 1)
             {
                 query = query.Where(q => q.CategoryId == searchRequest.CategoryId);
@@ -251,7 +255,9 @@ namespace ACE_PC.BL.Services
                         UserId = l.UserId,
                         UserName = l.User!.Name
                     }).ToList(),
-                    Comments = q.Comments!.Select(c => new CommentDto
+                    Comments = q.Comments!
+                    .OrderByDescending(c => c.CommentId) // or c.CreatedOn
+                    .Select(c => new CommentDto
                     {
                         Id = c.CommentId,
                         Content = c.Body,
@@ -363,7 +369,9 @@ namespace ACE_PC.BL.Services
                         UserId = l.UserId,
                         UserName = l.User!.Name
                     }).ToList(),
-                    Comments = q.Comments!.Select(c => new CommentDto
+                    Comments = q.Comments!
+                    .OrderByDescending(c => c.CommentId) // or c.CreatedOn
+                    .Select(c => new CommentDto
                     {
                         Id = c.CommentId,
                         Content = c.Body,
