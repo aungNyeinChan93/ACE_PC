@@ -1,15 +1,22 @@
 ﻿@page "/users"
-@attribute [Authorize(Roles ="admin")]
+@attribute [Authorize(Roles = "admin")]
 
 @inject UserUseCases UserUseCases;
-@using ACE_PC.BlazorServer.Components.Shared.User   
+@using ACE_PC.BlazorServer.Components.Shared.User
 @using ACE_PC.Domain.Models.Users
 
 <PageTitle>User Lists</PageTitle>
 
 <section>
 
-    <h3>Users</h3>
+    <PageTitleComponent TitleModel="UserTitle">
+        <Actions>
+            <button class="btn btn-primary">
+                <i class="bi bi-plus-lg"></i>
+                Create User
+            </button>
+        </Actions>
+    </PageTitleComponent>
 
     @if (UserDtos is null)
     {
@@ -31,6 +38,13 @@
 </pre>
 
 @code {
+
+    public BaseTitle UserTitle { get; set; } = new BaseTitle
+    {
+        Title = "User Management",
+        Subtitle = "Manage system users and roles ",
+        Icon = "bi bi-person-gear"
+    };
 
     public List<UserDto>? UserDtos { get; set; }
 

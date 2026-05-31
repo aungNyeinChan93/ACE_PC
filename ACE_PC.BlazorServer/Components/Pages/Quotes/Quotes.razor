@@ -13,7 +13,14 @@
     else
     {
     <div class="container">
-            <h3 class="text-info mb-3">Quotes List</h3>
+            @* <h3 class="text-info mb-3">Quotes List</h3> *@
+            <PageTitleComponent TitleModel="QuoteTitle">
+                @* <Actions>
+                    <button @onclick="@(() => NavigationManager.NavigateTo("/quotes/create"))" type="button" class="btn btn-primary ">
+                        <i class="bi bi-plus-lg"></i> Create
+                    </button>
+                </Actions> *@
+            </PageTitleComponent>
 
 
             <div class="container pt-4">
@@ -46,6 +53,13 @@
 </pre>
 
 @code {
+
+    public BaseTitle QuoteTitle { get; set; } = new BaseTitle
+    {
+        Title = "Quote Lists",
+        Subtitle= "",
+        Icon=""
+    };
 
     public List<QuotesDto>? MyQuotes { get; set; }
 
