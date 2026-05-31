@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <PackageReference Include="ANM.Blazored.Toast" Version="0.1.1" />
+    <PackageReference Include="MudBlazor" Version="9.5.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="Sotsera.Blazor.Toaster" Version="3.0.0" />
   </ItemGroup>

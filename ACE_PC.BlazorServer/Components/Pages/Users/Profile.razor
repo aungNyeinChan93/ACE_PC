@@ -7,15 +7,13 @@
 
 
 <AuthorizeView>
+
     <NotAuthorized>
         <div class="d-flex justify-content-center align-items-center mt-xxl-5">
             <Register2Component />
         </div>
     </NotAuthorized>
-</AuthorizeView>
 
-
-<AuthorizeView>
     <Authorized>
         <section>
             @if (AuthUser is null)
@@ -28,14 +26,14 @@
                 <ProfileCardComponent AuthUser="AuthUser" />
 
             }
-
         </section>
 
         <pre>
             @(JsonConvert.SerializeObject(AuthUser, Formatting.Indented))
-        </pre>  
+        </pre>
 
     </Authorized>
+
 </AuthorizeView>
 
 

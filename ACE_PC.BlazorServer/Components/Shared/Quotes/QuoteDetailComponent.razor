@@ -1,0 +1,40 @@
+﻿@using ACE_PC.BlazorServer.Components.Shared.Quotes
+
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+
+        <!-- Quote Card Section -->
+        <QuoteDetailCardComponent Quote="Quote" OnComment="HandleIsComment" />
+
+        <!-- Comment Box Section-->
+        @if (IsComment)
+        {
+            <div class="p-4">
+                <QuoteCommetCreate Quote="Quote" LoadQuote="LoadQuote" />
+            </div>
+        }
+
+        <!-- Comment Show Section-->
+        <QuoteCommentCard Comments="Quote.Comments" />
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public QuotesDto Quote { get; set; } = new();
+
+    public bool IsComment { get; set; }
+
+    [Parameter]
+    public EventCallback LoadQuote { get; set; }
+
+    public async Task HandleIsComment(bool status)
+    {
+        IsComment = status ? true : false;
+    }
+
+
+
+}

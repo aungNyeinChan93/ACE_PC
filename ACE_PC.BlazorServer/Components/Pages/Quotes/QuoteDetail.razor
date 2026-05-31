@@ -4,12 +4,12 @@
 
 @if (Quote is not null)
 {
-    <QuoteDetailCard Quote="Quote" LoadQuote="LoadQuote" />
+    <QuoteDetailComponent Quote="Quote" LoadQuote="LoadQuote" />
 
 }
 else
 {
-    <p>Loading ...</p>
+    <LoadingComponent/>
 }
 
 

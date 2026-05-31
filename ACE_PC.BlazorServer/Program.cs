@@ -10,6 +10,7 @@ using Blazored.Toast;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.IdentityModel.Tokens;
+using MudBlazor.Services;
 using Sotsera.Blazor.Toaster;
 using Sotsera.Blazor.Toaster.Core.Models;
 using System.Text;
@@ -48,6 +49,7 @@ builder.Services.AddHttpClient("client",options =>
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomeAuthenticationProvider>();
 
+builder.Services.AddMudServices();
 
 builder.Services.AddScoped<CategoriesUseCase>();
 builder.Services.AddBlazoredToast();

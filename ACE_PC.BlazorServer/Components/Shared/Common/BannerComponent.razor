@@ -1,0 +1,48 @@
+﻿<section class="bg-white py-5">
+
+    <div class="container">
+
+        <div class="row justify-content-center">
+
+            <div class="col-12 col-lg-8 text-center">
+
+                <!-- Title -->
+                <h1 class="fw-bold display-5 text-dark">
+                    Welcome
+                    <span class="text-primary">@(Name?.ToUpper() ?? "GUEST")</span>
+
+                </h1>
+
+                <!-- Subtitle -->
+                <p class="text-muted fs-5 mt-3">
+                    Astrobiology investigates the potential for life beyond Earth.
+                    Scientists study extreme environments on our planet to understand the conditions that might support life elsewhere. Missions to Mars, Europa, and other celestial bodies aim to detect signs of past or present life, 
+                    addressing one of humanity's most profound questions: Are we alone in the universe?
+
+                </p>
+
+                <!-- Buttons -->
+                <div class="d-flex justify-content-center mt-4 flex-wrap gap-3">
+
+                    <a href="/register" class="btn btn-primary btn-lg px-4 shadow-sm">
+                        Register
+                    </a>
+
+                    <a href="/login" class="btn btn-outline-secondary btn-lg px-4">
+                        SignIn
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+@code {
+    [Parameter]
+    public string? Name { get; set; }
+}
