@@ -11,5 +11,7 @@ namespace ACE_PC.Domain.Interfaces.Users
         Task<ResultModel<UserResponse>> GetUserByEmail(string email);
 
         Task<ResultModel<UsersResposne>> GetAllUses();
+
+        Task<ResultModel<UsersResposne>> GetAllUses(UserPaginationRequest request);
     }
 }

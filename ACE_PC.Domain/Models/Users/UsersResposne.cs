@@ -10,6 +10,6 @@ namespace ACE_PC.Domain.Models.Users
     {
         public List<UserDto>? UserDto { get; set; }
 
-        
+        public UserPaginationResut? PaginationResult { get; set; }
     }
 }
