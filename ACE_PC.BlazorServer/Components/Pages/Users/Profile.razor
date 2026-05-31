@@ -2,27 +2,43 @@
 @using ACE_PC.BlazorServer.Components.Shared.User
 @using ACE_PC.Domain.Dtos.Users
 @inject UserUseCases UserUseCases;
+@* @attribute [Authorize] *@
 
 
 
-<section>
-    @if (AuthUser is null)
-    {
-        <LoadingComponent />
-    }
-    else
-    {
-        <h3>Profile</h3>
-        <ProfileCardComponent AuthUser="AuthUser" />
-
-    }
-
-</section>
+<AuthorizeView>
+    <NotAuthorized>
+        <div class="d-flex justify-content-center align-items-center mt-xxl-5">
+            <Register2Component />
+        </div>
+    </NotAuthorized>
+</AuthorizeView>
 
 
-<pre>
-    @(JsonConvert.SerializeObject(AuthUser, Formatting.Indented))
-</pre>
+<AuthorizeView>
+    <Authorized>
+        <section>
+            @if (AuthUser is null)
+            {
+                <LoadingComponent />
+            }
+            else
+            {
+                <h3>Profile</h3>
+                <ProfileCardComponent AuthUser="AuthUser" />
+
+            }
+
+        </section>
+
+        <pre>
+            @(JsonConvert.SerializeObject(AuthUser, Formatting.Indented))
+        </pre>  
+
+    </Authorized>
+</AuthorizeView>
+
+
 
 @code {
 

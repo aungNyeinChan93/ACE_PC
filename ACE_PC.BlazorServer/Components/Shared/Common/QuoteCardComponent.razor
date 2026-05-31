@@ -1,0 +1,78 @@
+﻿
+<div class="container py-5">
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+
+            <div class="card border-0 shadow">
+
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">@MyQuote.Title</h4>
+                </div>
+
+                <div class="card-body">
+                    <p class="card-text fs-5">
+                        "@MyQuote.Content"
+                    </p>
+
+                    <hr />
+
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <strong>Author:</strong> @MyQuote.Author
+                        </div>
+
+                        <div>
+                            <strong>Category:</strong> @MyQuote.Category
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-footer bg-light">
+                    <div class="d-flex justify-content-between">
+                        <span>
+                            <i class="bi bi-heart-fill text-danger"></i>
+                            @MyQuote.Likes.Count Likes
+                        </span>
+
+                        <span>
+                            <i class="bi bi-chat-dots-fill text-primary"></i>
+                            @MyQuote.Comments.Count Comments
+                        </span>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+@code {
+    private Quote MyQuote = new()
+    {
+        Id = 12,
+        Title = "Sit minus dolores c",
+        Content = "Eveniet quas enim q",
+        Author = "admin",
+        AuthorId = 0,
+        Category = "22",
+        CategoryId = 0,
+        Likes = new() { "User1", "User2", "User3" },
+        Comments = new() { "Great quote!", "Nice one!" }
+    };
+
+    public class Quote
+    {
+        public int Id { get; set; }
+        public string Title { get; set; } = "";
+        public string Content { get; set; } = "";
+        public string Author { get; set; } = "";
+        public int AuthorId { get; set; }
+        public string Category { get; set; } = "";
+        public int CategoryId { get; set; }
+        public List<string> Likes { get; set; } = new();
+        public List<string> Comments { get; set; } = new();
+    }
+}

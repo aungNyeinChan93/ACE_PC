@@ -111,7 +111,6 @@ namespace ACE_PC.BL.Services
             var pageCount = request.PageCount;
             var pageNumber = request.PageNumber;
             var skip = (pageNumber - 1) * pageCount;
-
             var totalPage = (int)Math.Ceiling(totalQuotes / (double)pageCount);
 
             var paginationResult = new QuotesPaginationResult
@@ -142,7 +141,7 @@ namespace ACE_PC.BL.Services
                         UserName = l.User!.Name
                     }).ToList(),
                     Comments = q.Comments!
-                    .OrderByDescending(c => c.CommentId) // or c.CreatedOn
+                    .OrderByDescending(c => c.CommentId) 
                     .Select(c => new CommentDto
                     {
                         Id = c.CommentId,

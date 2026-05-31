@@ -1,0 +1,28 @@
+﻿@page "/tests/two"
+
+<section class="bg-light min-vh-100 py-5">
+
+    <div class="container">
+
+        <div class="mb-5 text-center">
+            <h2 class="fw-bold">Quotes Collection</h2>
+            <p class="text-muted">Clean Bootstrap UI Example</p>
+        </div>
+
+        <div class="row g-4">
+
+            @for (int i = 0; i < 6; i++)
+            {
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="h-100">
+                        @* <QuoteCardComponent /> *@
+                        <QuoteCard3Component/>
+                    </div>
+                </div>
+            }
+
+        </div>
+
+    </div>
+
+</section>

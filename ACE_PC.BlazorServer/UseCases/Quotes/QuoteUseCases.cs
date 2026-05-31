@@ -21,6 +21,8 @@ namespace ACE_PC.BlazorServer.UseCases.Quotes
             _localStorage = localStorage;
         }
 
+
+        //SetAuthHeader
         public async Task SetAuthHeader()
         {
             var token = (await _localStorage.GetAsync<string>("jwtAuth")).Value;
@@ -60,18 +62,13 @@ namespace ACE_PC.BlazorServer.UseCases.Quotes
         public async Task<ResultModel<QuotesResponse>> GetBySearchKey(QuoteSearchRequest searchReq, QuotePaginationRequest? paginationReq = default)
         {
             await this.SetAuthHeader();
-
-            // Fallback to defaults if paginationReq is null to prevent 400 Bad Request
             int pageNumber = paginationReq?.PageNumber ?? 1;
             int pageCount = paginationReq?.PageCount ?? 10;
 
             var queryParams = new Dictionary<string, string?>
             {
-                // Guaranteed to pass valid integers now
                 { "PageNumber", pageNumber.ToString() },
                 { "PageCount", pageCount.ToString() },
-
-                // Search Parameters
                 { "QuoteTitle", string.IsNullOrWhiteSpace(searchReq.QuoteTitle) ? null : searchReq.QuoteTitle },
                 { "AuthorId", searchReq.AuthorId >= 1 ? searchReq.AuthorId.ToString() : null },
                 { "AuthorName", string.IsNullOrWhiteSpace(searchReq.AuthorName) ? null : searchReq.AuthorName },
