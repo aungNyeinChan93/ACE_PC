@@ -1,10 +1,12 @@
 ﻿using ACE_PC.Database.Data;
+using ACE_PC.Domain.Dtos.Quotes;
 using ACE_PC.Domain.Dtos.Users;
 using ACE_PC.Domain.Entity;
 using ACE_PC.Domain.Helpers.ReqResHelper;
 using ACE_PC.Domain.Interfaces.Users;
 using ACE_PC.Domain.Models.Users;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -26,11 +28,12 @@ namespace ACE_PC.BL.Services
         {
             var responseModel = new ResultModel<UsersResposne>();
 
-            var users = await _context.Users.AsNoTracking()
+            var users = await _context.Users
                 .Include(u => u.Role)!
                 .Include(u => u.Quotes)!
-                .Include(u => u.Comments)!
-                .Include(u => u.Likes)!.ThenInclude(l => l.Quote)!
+                .Include(u => u.Comments)!.ThenInclude(c=>c.Quote)
+                .Include(u => u.Comments)!.ThenInclude(c=>c.User)
+                .Include(u => u.Likes)!.ThenInclude(l => l.Quote)!.ThenInclude(q=>q!.User)!
                 .Include(u => u.Likes)!.ThenInclude(l => l.User)!
                 .Select(u => new UserDto
                 {
@@ -39,15 +42,20 @@ namespace ACE_PC.BL.Services
                     Email = u.Email,
                     Role = u.Role,
                     Quotes = u.Quotes,
-                    Comments = u.Comments,
-                    Likes = u.Likes,
+                    Comments = u.Comments!.Select(c=> new CommentDto
+                    {
+                        Id = c.CommentId,
+                        Content = c.Body,
+                        UserName = c.User!.Name
+                    }).ToList(),
+                    Likes = u.Likes!.ToList(),
                     LikeQuotes = u.Likes!.Select(l => l.Quote).ToList()!
                 })
                 .ToListAsync();
 
-            if (users is null || users.Count <=0)
+            if (users is null || users.Count <= 0)
             {
-                responseModel = ResultModel<UsersResposne>.ValidationError(400,"Users Not found!");
+                responseModel = ResultModel<UsersResposne>.ValidationError(400, "Users Not found!");
                 goto skip;
             }
 
@@ -56,9 +64,9 @@ namespace ACE_PC.BL.Services
                 UserDto = users
             };
 
-            responseModel = ResultModel<UsersResposne>.Success(200,"Get All Uses",data);
+            responseModel = ResultModel<UsersResposne>.Success(200, "Get All Uses", data);
 
-            
+
 
         skip:
             return responseModel;
@@ -67,18 +75,36 @@ namespace ACE_PC.BL.Services
         // GetUserByEmail
         public async Task<ResultModel<UserResponse>> GetUserByEmail(string email)
         {
-            var responseModel =new ResultModel<UserResponse>();
+            var responseModel = new ResultModel<UserResponse>();
 
             var user = await _context.Users.AsNoTracking()
-                .Include(u=> u.Role)
-                .Select(u=> new User
+                .Include(u => u.Role)
+                .Include(u => u.Quotes)!.ThenInclude(q => q.Likes)
+                .Include(u => u.Quotes)!.ThenInclude(q => q.Category)
+                .Include(u => u.Comments)!.ThenInclude(c => c.Quote)
+                .Include(u => u.Comments)!.ThenInclude(c => c.User)
+                .Include(u => u.Likes)!.ThenInclude(l => l.User)
+                .Include(u => u.Likes)!.ThenInclude(l => l.Quote)
+                .Select(u => new UserDto
                 {
+                    UserId = u.UserId,
                     Email = u.Email,
-                    Name = u.Name,
-                    RoleId = u.RoleId,
                     Role = u.Role,
+                    Quotes = u.Quotes,
+                    Comments = u.Comments!.Select(c=> new CommentDto
+                    {
+                        Id = c.CommentId,
+                        Content = c.Body,
+                        UserName  = c.User!.Name
+                    }).ToList(),
+                    Likes = u.Likes!.ToList(),
+                    LikeQuotes = u.Likes!.Select(l => new Quote
+                    {
+                       Title = l.Quote!.Title
+                    }).ToList(),
+                     Name = u.Name,
                 })
-                .FirstOrDefaultAsync(u=>u.Email == email);
+                .FirstOrDefaultAsync(u => u.Email == email);
 
             if (user is null)
             {
@@ -92,5 +118,8 @@ namespace ACE_PC.BL.Services
         skip:
             return responseModel;
         }
+
+        //GetUserById
+        //public async Task<ResultModel<>>
     }
 }

@@ -1,0 +1,162 @@
+﻿@using ACE_PC.Domain.Dtos.Users
+
+@(JsonConvert.SerializeObject(AuthUser, Formatting.Indented))
+
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-5 col-md-7">
+
+            <div class="card rounded-4 overflow-hidden border-0 shadow-lg">
+
+                <!-- Profile Header -->
+                <div class="bg-dark p-4 text-center text-white">
+
+                    <img src="@User.ProfileImage"
+                         class="rounded-circle border border-4 border-white shadow"
+                         width="120"
+                         height="120" />
+
+                    <h3 class="mb-1 mt-3">@AuthUser?.Name.ToUpper()</h3>
+
+                    <span class="badge bg-light text-dark px-3 py-2">
+                        @AuthUser?.Role?.Name
+                    </span>
+
+                </div>
+
+                <!-- Profile Body -->
+                <div class="card-body p-4">
+
+                    <div class="mb-3">
+                        <label class="fw-bold text-muted">User ID</label>
+                        <div class="form-control">@AuthUser?.UserId</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="fw-bold text-muted">Email</label>
+                        <div class="form-control">@AuthUser?.Email</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="fw-bold text-muted">Password</label>
+                        <div class="form-control">••••••••</div>
+                    </div>
+
+                    <!-- Stats -->
+                    <div class="row mt-4 text-center">
+
+                        <div class="col-4">
+                            <div class="rounded-3 border p-3 shadow-sm">
+                                <h4>@User.Quotes.Count</h4>
+                                <small class="text-muted">Quotes</small>
+                            </div>
+                        </div>
+
+                        <div class="col-4">
+                            <div class="rounded-3 border p-3 shadow-sm">
+                                <h4>@User.Comments.Count</h4>
+                                <small class="text-muted">Comments</small>
+                            </div>
+                        </div>
+
+                        <div class="col-4">
+                            <div class="rounded-3 border p-3 shadow-sm">
+                                <h4>@User.Likes.Count</h4>
+                                <small class="text-muted">Likes</small>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- Footer -->
+                <div class="card-footer border-0 bg-white pb-4 text-center">
+
+                    <button class="btn btn-dark rounded-pill px-4">
+                        Edit Profile
+                    </button>
+
+                    <button class="btn btn-outline-danger rounded-pill ms-2 px-4">
+                        Logout
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public UserDto? AuthUser { get; set; }
+
+    public UserProfile User = new()
+    {
+        UserId = 1,
+        Name = "Aung Nyein Chan",
+        Email = "aungnyeinchan@gmail.com",
+        Password = "123456",
+        ProfileImage = "https://i.pravatar.cc/300?img=12",
+
+        Role = new Role
+        {
+            RoleId = 1,
+            Name = "Admin"
+        },
+
+        Quotes = new List<string>
+        {
+            "Stay hard.",
+            "Never give up.",
+            "Code everyday."
+        },
+
+        Comments = new List<string>
+        {
+            "Great post!",
+            "Awesome UI!",
+            "Very helpful."
+        },
+
+        Likes = new List<string>
+        {
+            "Post 1",
+            "Post 2",
+            "Post 3",
+            "Post 4",
+            "Post 5"
+        }
+    };
+
+    public class UserProfile
+    {
+        public int UserId { get; set; }
+
+        public string Name { get; set; } = string.Empty;
+
+        public string Password { get; set; } = string.Empty;
+
+        public string Email { get; set; } = string.Empty;
+
+        public string ProfileImage { get; set; } = string.Empty;
+
+        public Role Role { get; set; } = new();
+
+        public List<string> Quotes { get; set; } = new();
+
+        public List<string> Comments { get; set; } = new();
+
+        public List<string> Likes { get; set; } = new();
+    }
+
+    public class Role
+    {
+        public int RoleId { get; set; }
+
+        public string Name { get; set; } = string.Empty;
+    }
+}

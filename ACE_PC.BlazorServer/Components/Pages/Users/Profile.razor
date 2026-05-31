@@ -1,19 +1,32 @@
 ﻿@page "/profile";
+@using ACE_PC.BlazorServer.Components.Shared.User
+@using ACE_PC.Domain.Dtos.Users
 @inject UserUseCases UserUseCases;
 
+
+
 <section>
-    <h3>Profile</h3>
-    
+    @if (AuthUser is null)
+    {
+        <LoadingComponent />
+    }
+    else
+    {
+        <h3>Profile</h3>
+        <ProfileCardComponent AuthUser="AuthUser" />
+
+    }
+
 </section>
 
 
 <pre>
-    @(JsonConvert.SerializeObject(AuthUser,Formatting.Indented))
+    @(JsonConvert.SerializeObject(AuthUser, Formatting.Indented))
 </pre>
 
 @code {
 
-    public User AuthUser { get; set; } = null!;
+    public UserDto? AuthUser { get; set; } = null!;
 
     protected override async Task OnInitializedAsync()
     {
@@ -26,6 +39,6 @@
 
     protected async override Task OnAfterRenderAsync(bool firstRender)
     {
-       
+
     }
 }

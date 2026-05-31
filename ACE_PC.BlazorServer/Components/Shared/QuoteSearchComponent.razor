@@ -4,21 +4,17 @@
     <div class="row justify-content-end">
         <div class="col-md-6 col-lg-5">
 
-            @* The Main Rounded Wrapper Container *@
             <div class="d-flex align-items-center rounded-pill border bg-white px-3 py-1 shadow-sm">
 
-                @* Muted Search Icon *@
                 <span class="text-muted d-flex align-items-center me-2">
                     <i class="bi bi-search fs-5 opacity-75"></i>
                 </span>
 
-                @* Borderless Transparent Input Field *@
                 <input @bind="SearchKey"
                        @bind:event="oninput"
                        class="form-control border-0 bg-transparent p-2 shadow-none"
                        placeholder="Search quotes, authors..." />
 
-                @* Floating Circular Clear Button (Only shows when text exists) *@
                 @if (!string.IsNullOrEmpty(SearchKey))
                 {
                     <button class="btn btn-light text-muted rounded-circle d-flex align-items-center justify-content-center me-2 p-0"
@@ -30,7 +26,6 @@
                     </button>
                 }
 
-                @* Pill-shaped Theme Accent Action Button *@
                 <button class="btn btn-info rounded-pill fw-semibold text-nowrap px-4 py-2 text-white shadow-sm"
                         type="button"
                         @onclick="ExecuteSearch">

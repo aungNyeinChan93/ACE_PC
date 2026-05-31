@@ -45,6 +45,10 @@ builder.Services.AddHttpClient("client",options =>
 
 
 //services
+builder.Services.AddCascadingAuthenticationState();
+builder.Services.AddScoped<AuthenticationStateProvider, CustomeAuthenticationProvider>();
+
+
 builder.Services.AddScoped<CategoriesUseCase>();
 builder.Services.AddBlazoredToast();
 builder.Services.AddScoped<AuthUseCase>();
@@ -52,11 +56,6 @@ builder.Services.AddScoped<UserUseCases>();
 builder.Services.AddScoped<QuoteUseCases>();
 builder.Services.AddScoped<CommentUseCases>();
 
-
-
-
-builder.Services.AddCascadingAuthenticationState();
-builder.Services.AddScoped<AuthenticationStateProvider , CustomeAuthenticationProvider>();
 
 
 

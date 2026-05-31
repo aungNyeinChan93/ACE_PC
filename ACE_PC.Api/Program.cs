@@ -11,14 +11,21 @@ using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+
+//DATABASE
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("Default"));
 });
 
-builder.Services.MapAuth(builder.Configuration);
+//CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("client",p=> p.WithOrigins("https://localhost:7046").AllowAnyHeader().AllowAnyMethod());
+});
 
+//SERVICES
+builder.Services.MapAuth(builder.Configuration);
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
@@ -27,10 +34,6 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IQuoteService, QuoteService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("client",p=> p.WithOrigins("https://localhost:7046").AllowAnyHeader().AllowAnyMethod());
-});
 
 //APP
 var app = builder.Build();

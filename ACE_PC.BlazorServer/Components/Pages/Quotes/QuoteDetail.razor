@@ -1,6 +1,6 @@
 ﻿@page "/quotes/detail/{quoteId:int}"
-@inject QuoteUseCases QuoteUseCases
-
+@inject QuoteUseCases QuoteUseCases;
+@attribute [Authorize(Roles ="user,admin")]
 
 @if (Quote is not null)
 {

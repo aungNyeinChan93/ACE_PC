@@ -1,4 +1,5 @@
 ﻿using ACE_PC.BlazorServer.Providers;
+using ACE_PC.Domain.Dtos.Users;
 using ACE_PC.Domain.Entity;
 using ACE_PC.Domain.Helpers.ReqResHelper;
 using ACE_PC.Domain.Models.Users;
@@ -21,7 +22,7 @@ namespace ACE_PC.BlazorServer.UseCases.Users
             _httpClient = factory.CreateClient("client");
         }
 
-        public async Task<User> GetAuthUser()
+        public async Task<UserDto> GetAuthUser()
         {
             var authState = await ((CustomeAuthenticationProvider)_stateProvider).GetAuthenticationStateAsync();
             var email = authState.User.FindFirstValue(ClaimTypes.Email);

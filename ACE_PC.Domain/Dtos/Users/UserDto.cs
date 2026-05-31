@@ -1,4 +1,5 @@
-﻿using ACE_PC.Domain.Entity;
+﻿using ACE_PC.Domain.Dtos.Quotes;
+using ACE_PC.Domain.Entity;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -21,7 +22,7 @@ namespace ACE_PC.Domain.Dtos.Users
 
         public List<Quote>? Quotes { get; set; }
 
-        public List<Comment>? Comments { get; set; }
+        public List<CommentDto>? Comments { get; set; }
 
         public List<Like>? Likes { get; set; }
 

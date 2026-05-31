@@ -55,7 +55,7 @@ namespace ACE_PC.Database.Data
 
             modelBuilder.Entity<Comment>()
                 .HasOne(c => c.User)
-                .WithMany()
+                .WithMany(q=>q.Comments)
                 .HasForeignKey(c => c.UserId)
                 .OnDelete(DeleteBehavior.Restrict); // prevent multiple cascade paths
         }

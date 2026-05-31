@@ -1,11 +1,17 @@
 ﻿@page "/quotes"
-@using ACE_PC.BlazorServer.Components.Shared
+
 @inject QuoteUseCases QuoteUseCases;
 @attribute [Authorize];
 @inject NavigationManager NavigationManager
+@attribute [StreamRendering]
 
 <section>
-   
+   @if (MyQuotes is null)
+    {
+        <LoadingComponent/>
+    }
+    else
+    {
     <div class="container">
         <h3 class="text-info mb-3">Quotes List</h3>
 
@@ -16,9 +22,8 @@
         </div>
         <QuoteSearchComponent OnSearchCompleted="HandleSearchCompleted" />
     </div>
-
-   
     <QuoteTableComponent LaodQuotes="LoadQuotes" Quotes="MyQuotes" />
+    }
 </section>
 
 
@@ -26,12 +31,14 @@
 <hr />
 <pre>
      @(JsonConvert.SerializeObject(MyQuotes, Formatting.Indented))
+     @(JsonConvert.SerializeObject(Pagination, Formatting.Indented))
 </pre>
 
 @code {
 
+    public List<QuotesDto>? MyQuotes { get; set; }
 
-    public List<QuotesDto> MyQuotes { get; set; } = [];
+    public QuotesPaginationResult? Pagination { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -41,10 +48,19 @@
 
     public async Task LoadQuotes()
     {
-        var response = await QuoteUseCases.GetAllQuotes();
+        await Task.Delay(300);
+
+        var paginationData = new QuotePaginationRequest
+            {
+                PageCount = 5,
+                PageNumber = 1
+            };
+
+        var response = await QuoteUseCases.GetAllQuotes(paginationRequest :paginationData);
         if (response.IsSuccess)
         {
-            var quotes = response.Data!.Quotes;
+            Pagination = response?.Data?.PaginationResult;
+            var quotes = response?.Data!.Quotes;
             if (quotes is not null)
             {
                 // MyQuotes.Clear();
