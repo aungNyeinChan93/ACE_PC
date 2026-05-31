@@ -1,6 +1,8 @@
 ﻿@page "/users"
+@attribute [Authorize(Roles ="admin")]
+
 @inject UserUseCases UserUseCases;
-@using ACE_PC.BlazorServer.Components.Shared.User
+@using ACE_PC.BlazorServer.Components.Shared.User   
 @using ACE_PC.Domain.Models.Users
 
 <PageTitle>User Lists</PageTitle>
