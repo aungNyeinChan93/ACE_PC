@@ -8,25 +8,23 @@
 <PageTitle>User Lists</PageTitle>
 
 <section>
-
-    <PageTitleComponent TitleModel="UserTitle">
-        <Actions>
-            <button class="btn btn-primary">
-                <i class="bi bi-plus-lg"></i>
-                Create User
-            </button>
-        </Actions>
-    </PageTitleComponent>
-
     @if (UserDtos is null)
     {
         <LoadingComponent />
     }
     else
     {
+        <PageTitleComponent TitleModel="UserTitle">
+            <Actions>
+                <button class="btn btn-primary">
+                    <i class="bi bi-plus-lg"></i>
+                    Create User
+                </button>
+            </Actions>
+        </PageTitleComponent>
+
         <UserListsComponent Users="UserDtos" />
     }
-
 </section>
 
 

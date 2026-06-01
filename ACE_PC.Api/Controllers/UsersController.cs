@@ -19,6 +19,8 @@ namespace ACE_PC.Api.Controllers
             _userService = userService;
         }
 
+
+        //GetByEmail
         [HttpGet("{email}")]
         public async Task<IActionResult> GetByEmail(string email)
         {
@@ -71,6 +73,29 @@ namespace ACE_PC.Api.Controllers
         public async Task<IActionResult> GetAllUsers([FromQuery]UserPaginationRequest paginationRequest)
         {
             var response = await _userService.GetAllUses(paginationRequest);
+            if (response.IsError)
+            {
+                if (response.ResponseType == EnumResponseType.Pending)
+                {
+                    return StatusCode(102, response);
+                }
+                if (response.ResponseType == EnumResponseType.ValidationError)
+                {
+                    return StatusCode(400, response);
+                }
+                if (response.ResponseType == EnumResponseType.SystemError)
+                {
+                    return StatusCode(500, response);
+                }
+            }
+            return Ok(response);
+        }
+
+        //GetUserById
+        [HttpGet("{id:int}")]
+        public async Task<IActionResult> GetUserById([FromRoute]int id)
+        {
+            var response = await _userService.GetUserById(id);
             if (response.IsError)
             {
                 if (response.ResponseType == EnumResponseType.Pending)

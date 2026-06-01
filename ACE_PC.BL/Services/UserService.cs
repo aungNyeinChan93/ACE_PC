@@ -31,9 +31,9 @@ namespace ACE_PC.BL.Services
             var users = await _context.Users
                 .Include(u => u.Role)!
                 .Include(u => u.Quotes)!
-                .Include(u => u.Comments)!.ThenInclude(c=>c.Quote)
-                .Include(u => u.Comments)!.ThenInclude(c=>c.User)
-                .Include(u => u.Likes)!.ThenInclude(l => l.Quote)!.ThenInclude(q=>q!.User)!
+                .Include(u => u.Comments)!.ThenInclude(c => c.Quote)
+                .Include(u => u.Comments)!.ThenInclude(c => c.User)
+                .Include(u => u.Likes)!.ThenInclude(l => l.Quote)!.ThenInclude(q => q!.User)!
                 .Include(u => u.Likes)!.ThenInclude(l => l.User)!
                 .Select(u => new UserDto
                 {
@@ -42,7 +42,7 @@ namespace ACE_PC.BL.Services
                     Email = u.Email,
                     Role = u.Role,
                     Quotes = u.Quotes,
-                    Comments = u.Comments!.Select(c=> new CommentDto
+                    Comments = u.Comments!.Select(c => new CommentDto
                     {
                         Id = c.CommentId,
                         Content = c.Body,
@@ -88,7 +88,7 @@ namespace ACE_PC.BL.Services
                 ItemCount = userCount,
                 PageCount = pageCount,
                 PageNumber = pageNumber,
-                TotalPage= totalPage,
+                TotalPage = totalPage,
             };
 
             var users = await _context.Users
@@ -157,18 +157,18 @@ namespace ACE_PC.BL.Services
                     Email = u.Email,
                     Role = u.Role,
                     Quotes = u.Quotes,
-                    Comments = u.Comments!.Select(c=> new CommentDto
+                    Comments = u.Comments!.Select(c => new CommentDto
                     {
                         Id = c.CommentId,
                         Content = c.Body,
-                        UserName  = c.User!.Name
+                        UserName = c.User!.Name
                     }).ToList(),
                     Likes = u.Likes!.ToList(),
                     LikeQuotes = u.Likes!.Select(l => new Quote
                     {
-                       Title = l.Quote!.Title
+                        Title = l.Quote!.Title
                     }).ToList(),
-                     Name = u.Name,
+                    Name = u.Name,
                 })
                 .FirstOrDefaultAsync(u => u.Email == email);
 
@@ -186,6 +186,50 @@ namespace ACE_PC.BL.Services
         }
 
         //GetUserById
-        //public async Task<ResultModel<>>
+        public async Task<ResultModel<UserResponse>> GetUserById(int id)
+        {
+            var responseModel = new ResultModel<UserResponse>();
+
+            var user = await _context.Users.AsNoTracking()
+                .Include(u => u.Role)!
+                .Include(u => u.Quotes)!
+                .Include(u => u.Comments)!.ThenInclude(c => c.Quote)
+                .Include(u => u.Comments)!.ThenInclude(c => c.User)
+                .Include(u => u.Likes)!.ThenInclude(l => l.Quote)!.ThenInclude(q => q!.User)!
+                .Include(u => u.Likes)!.ThenInclude(l => l.User)!
+                .Where(u => u.UserId == id)
+                .Select(u => new UserDto
+                {
+                    UserId = u.UserId,
+                    Email = u.Email,
+                    Role = u.Role,
+                    Quotes = u.Quotes,
+                    Comments = u.Comments!.Select(c => new CommentDto
+                    {
+                        Id = c.CommentId,
+                        Content = c.Body,
+                        UserName = c.User!.Name
+                    }).ToList(),
+                    Likes = u.Likes!.ToList(),
+                    LikeQuotes = u.Likes!.Select(l => new Quote
+                    {
+                        Title = l.Quote!.Title
+                    }).ToList(),
+                    Name = u.Name,
+                })
+                .FirstOrDefaultAsync();
+
+            if (user is null)
+            {
+                responseModel = ResultModel<UserResponse>.ValidationError(404, "User Not Found!");
+                goto skip;
+            }
+
+            var data = new UserResponse { User = user };
+            responseModel = ResultModel<UserResponse>.Success(200, "User found!", data);
+
+        skip:
+            return responseModel;
+        }
     }
 }

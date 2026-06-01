@@ -68,5 +68,15 @@ namespace ACE_PC.BlazorServer.UseCases.Users
 
             return response!;
         }
+
+        //GetUserById
+        public async Task<ResultModel<UserResponse>> GetUserById(int id)
+        {
+            var response = await _httpClient.GetFromJsonAsync<ResultModel<UserResponse>>($"/api/users/{id}");
+            return response!;
+        }
+
+
+
     }
 }
