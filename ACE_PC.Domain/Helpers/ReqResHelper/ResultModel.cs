@@ -13,12 +13,13 @@ namespace ACE_PC.Domain.Helpers.ReqResHelper
         public bool IsSuccess { get; set; }
         public bool IsError { get { return !IsSuccess; } }
         public T? Data { get; set; }
+
         public static ResultModel<T> Success(int resCode, string resMess, T? data = default)
         {
             return new ResultModel<T>
             {
                 ResponseCode = resCode,
-                IsSuccess = true,
+                IsSuccess = true, 
                 ResponseMessage = resMess,
                 ResponseType = EnumResponseType.Success,
                 Data = data

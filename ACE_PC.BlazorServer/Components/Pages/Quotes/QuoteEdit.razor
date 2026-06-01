@@ -3,6 +3,7 @@
 @inject CategoriesUseCase CategoriesUseCase;
 @inject QuoteUseCases QuoteUseCases;
 @inject NavigationManager NavigationManager;
+@inject ISnackbar Snackbar;
 
 @using ACE_PC.Domain.Models.Quotes
 <h3 class="mb-4">Update Quote</h3>
@@ -77,6 +78,7 @@
         if (response.IsSuccess)
         {
             Console.WriteLine($"{response.ResponseMessage}");
+            Snackbar.Add(response.ResponseMessage);
             NavigationManager.NavigateTo("/quotes");
         }
     }

@@ -3,6 +3,8 @@
 
 @inject AuthUseCase AuthUseCase;
 @inject NavigationManager NavigationManager;
+@inject ISnackbar Snackbar;
+
 
 <section class="min-vh-100 d-flex align-items-center bg-light">
 
@@ -88,12 +90,27 @@
 
     private async Task OnLogin()
     {
-        var response = await AuthUseCase.LoginAsync(LoginModel);
-
-        if (response.IsSuccess)
+        try
         {
-            NavigationManager.NavigateTo("/");
+            var response = await AuthUseCase.LoginAsync(LoginModel);
+
+            if (response.IsError)
+            {
+                Snackbar.Add(response.ResponseMessage);
+                return;
+            }
+
+            if (response.IsSuccess)
+            {
+                NavigationManager.NavigateTo("/");
+                Snackbar.Add(response.ResponseMessage);
+            }
         }
+        catch (Exception err)
+        {
+            Snackbar.Add(err.Message);
+        }
+
     }
 
 }

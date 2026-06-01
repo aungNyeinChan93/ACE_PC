@@ -1,6 +1,6 @@
 ﻿@inject QuoteUseCases QuoteUseCases;
 @inject NavigationManager NavigationManager;
-
+@inject ISnackbar Snackbar;
 
 
 <tr>
@@ -51,7 +51,7 @@
     public QuotesDto Quote { get; set; } = new QuotesDto();
 
     [Parameter]
-    public EventCallback LaodQuotes { get; set; }
+    public EventCallback<QuotePaginationRequest> LaodQuotes { get; set; }
 
     public AppModal? Modal { get; set; }
 
@@ -63,6 +63,7 @@
         var response = await QuoteUseCases.DeleteAsync(DeleteId);
         if (response.IsSuccess)
         {
+            Snackbar.Add(response.ResponseMessage);
             Console.WriteLine($"{response.ResponseMessage}");
             Modal?.Close();
             await LaodQuotes.InvokeAsync();

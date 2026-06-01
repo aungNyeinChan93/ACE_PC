@@ -3,6 +3,7 @@
 @inject CategoriesUseCase CategoriesUseCase;
 @inject QuoteUseCases QuoteUseCases;
 @inject NavigationManager NavigationManager;
+@inject ISnackbar Snackbar;
 
 <h3 class="mb-4">Create Quote</h3>
 
@@ -68,6 +69,7 @@
         if (response.IsSuccess)
         {
             Console.WriteLine($"Create Success - {response.Data!.Quote!.Title} ");
+            Snackbar.Add(response.ResponseMessage);
             NavigationManager.NavigateTo("/quotes");
         }
 

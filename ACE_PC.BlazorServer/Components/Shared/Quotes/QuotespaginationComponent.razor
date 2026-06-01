@@ -1,14 +1,34 @@
 ﻿
 
+<MudPagination Color="Color.Primary"
+               Count="PaginationResult.TotalPage"
+               SelectedChanged="OnPageChanged" />
 
 
-
-<MudPagination  Color="Color.Primary" Count="4" @bind-Selected="@_selected"/>
-
-<MudText Align="Align.Center">Selected page: @_selected</MudText>
-
-
+<MudText Align="Align.Center">
+    Selected page: @PaginationResult.PageNumber
+</MudText>
 
 @code {
-    private int _selected = 1;
+
+    [Parameter]
+    public QuotesPaginationResult PaginationResult { get; set; } = new();
+
+    [Parameter]
+    public EventCallback<int> PageChanged { get; set; }
+
+    [Parameter]
+    public EventCallback<QuotePaginationRequest> LoadQuotes { get; set; }
+
+    private async Task OnPageChanged(int page)
+    {
+        PaginationResult.PageNumber = page;
+        var paginationRequest = new QuotePaginationRequest
+        {
+            PageCount = PaginationResult.PageCount,
+            PageNumber = PaginationResult.PageNumber
+        };
+        await LoadQuotes.InvokeAsync(paginationRequest);
+        StateHasChanged();
+    }
 }

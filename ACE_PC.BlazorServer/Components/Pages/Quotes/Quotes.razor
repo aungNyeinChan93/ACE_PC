@@ -16,6 +16,8 @@
     else
     {
     <div class="container">
+
+            <!-- Quote Title-->
             <PageTitleComponent TitleModel="QuoteTitle">
                 @* <Actions>
                     <button @onclick="@(() => NavigationManager.NavigateTo("/quotes/create"))" type="button" class="btn btn-primary ">
@@ -24,7 +26,7 @@
                 </Actions> *@
             </PageTitleComponent>
 
-
+            <!-- Quote Search-->
             <div class="container pt-4">
                 <div class="row">
                     <div class="col-12 col-lg-6">
@@ -37,11 +39,12 @@
                     </div>
                 </div>
             </div>
+
             <!-- Quote Table-->      
-            <QuoteTableComponent LaodQuotes="LoadQuotes" Quotes="MyQuotes" />
+            <QuoteTableComponent LaodQuotes="LoadQuotes"  Quotes="MyQuotes" />
 
             <!-- Quotes Pagination -->
-            <QuotespaginationComponent/>
+            <QuotespaginationComponent LoadQuotes="LoadQuotes" PaginationResult="PaginationResult" />
           </div>
     }
 </section>
@@ -50,43 +53,44 @@
 <br />
 <hr />
 <pre>
-     @(JsonConvert.SerializeObject(MyQuotes, Formatting.Indented))
-     @(JsonConvert.SerializeObject(Pagination, Formatting.Indented))
+     @* @(JsonConvert.SerializeObject(MyQuotes, Formatting.Indented)) *@
+     @* @(JsonConvert.SerializeObject(PaginationResult, Formatting.Indented)) *@
 </pre>
+
 
 @code {
 
     public BaseTitle QuoteTitle { get; set; } = new BaseTitle
     {
         Title = "Quote Lists",
-        Subtitle= "",
-        Icon=""
+        Subtitle= "Learn,Think and Code",
+        Icon = "bi bi-chat-square-quote-fill"
     };
 
     public List<QuotesDto>? MyQuotes { get; set; }
 
-    public QuotesPaginationResult? Pagination { get; set; }
+    public QuotesPaginationResult? PaginationResult { get; set; }
+
+    public QuotePaginationRequest PaginationRequest { get; set; } = new QuotePaginationRequest
+    {
+        PageCount = 10,
+        PageNumber = 1
+    };
 
     protected override async Task OnInitializedAsync()
     {
-        await this.LoadQuotes();
+        await this.LoadQuotes(PaginationRequest);
 
     }
 
-    public async Task LoadQuotes()
+    public async Task LoadQuotes(QuotePaginationRequest pagination)
     {
         await Task.Delay(300);
 
-        var paginationData = new QuotePaginationRequest
-            {
-                PageCount = 5,
-                PageNumber = 1
-            };
-
-        var response = await QuoteUseCases.GetAllQuotes(paginationRequest :paginationData);
+        var response = await QuoteUseCases.GetAllQuotes(paginationRequest: pagination);
         if (response.IsSuccess)
         {
-            Pagination = response?.Data?.PaginationResult;
+            PaginationResult = response?.Data?.PaginationResult;
             var quotes = response?.Data!.Quotes;
             if (quotes is not null)
             {

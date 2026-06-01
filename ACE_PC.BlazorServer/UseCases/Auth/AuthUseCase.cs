@@ -25,6 +25,16 @@ namespace ACE_PC.BlazorServer.UseCases.Auth
         {
             var response = await _httpClient.PostAsJsonAsync("/api/auth/login",request);
 
+            if (!response.IsSuccessStatusCode)
+            {
+                var resStr = await response.Content.ReadAsStringAsync();
+                var result = JsonConvert.DeserializeObject<ResultModel<LoginResponse>>(resStr);
+                result!.ResponseMessage = "Credential Wrong!";
+                result.ResponseCode = 200;
+                result.IsSuccess = false;
+                return result;
+            }
+
             if (response.IsSuccessStatusCode)
             {
 
@@ -35,6 +45,7 @@ namespace ACE_PC.BlazorServer.UseCases.Auth
 
                 return result!;
             }
+
             return default!;
         }
         

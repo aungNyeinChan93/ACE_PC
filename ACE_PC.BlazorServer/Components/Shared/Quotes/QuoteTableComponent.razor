@@ -33,5 +33,5 @@
     public List<QuotesDto> Quotes { get; set; } = [];
 
     [Parameter]
-    public EventCallback LaodQuotes { get; set; }
+    public EventCallback<QuotePaginationRequest> LaodQuotes { get; set; }
 }
