@@ -5,6 +5,9 @@
 @attribute [StreamRendering]
 @attribute [Authorize];
 
+
+<PageTitle> Quotes </PageTitle>
+
 <section>
    @if (MyQuotes is null)
     {
@@ -13,7 +16,6 @@
     else
     {
     <div class="container">
-            @* <h3 class="text-info mb-3">Quotes List</h3> *@
             <PageTitleComponent TitleModel="QuoteTitle">
                 @* <Actions>
                     <button @onclick="@(() => NavigationManager.NavigateTo("/quotes/create"))" type="button" class="btn btn-primary ">
