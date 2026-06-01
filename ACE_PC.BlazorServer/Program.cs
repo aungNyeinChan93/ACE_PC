@@ -1,6 +1,7 @@
 using ACE_PC.BlazorServer.Components;
 using ACE_PC.BlazorServer.Middleware;
 using ACE_PC.BlazorServer.Providers;
+using ACE_PC.BlazorServer.Services;
 using ACE_PC.BlazorServer.UseCases.Auth;
 using ACE_PC.BlazorServer.UseCases.Categories;
 using ACE_PC.BlazorServer.UseCases.Comments;
@@ -57,6 +58,7 @@ builder.Services.AddScoped<AuthUseCase>();
 builder.Services.AddScoped<UserUseCases>();
 builder.Services.AddScoped<QuoteUseCases>();
 builder.Services.AddScoped<CommentUseCases>();
+builder.Services.AddScoped<CommonUserInterfaceService>();
 
 
 

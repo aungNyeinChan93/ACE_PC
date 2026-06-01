@@ -1,4 +1,5 @@
-﻿
+﻿@using ACE_PC.Domain.Models.Users
+
 <div class="card mt-4 border-0 shadow-sm">
     <div class="card-body">
 
@@ -10,34 +11,30 @@
             </MudText>
 
             <MudPagination Color="Color.Primary"
-                           Count="@PaginationResult.TotalPage"
-                           Selected="@PaginationResult.PageNumber"
-                           SelectedChanged="OnPageChanged" />
+            Count="@PaginationResult.TotalPage"
+            Selected="@PaginationResult.PageNumber"
+            SelectedChanged="OnPageChanged" />
 
         </div>
     </div>
-</div> 
-
-
-
+</div>
 
 @code {
 
     [Parameter]
-    public QuotesPaginationResult PaginationResult { get; set; } = new();
+    public UserPaginationResut PaginationResult { get; set; } = new();
 
     [Parameter]
-    public EventCallback<QuotePaginationRequest> LoadQuotes { get; set; }
+    public EventCallback<UserPaginationRequest> LoadUsers { get; set; }
 
     private async Task OnPageChanged(int page)
     {
-        PaginationResult.PageNumber = page;
-        var paginationRequest = new QuotePaginationRequest
+        var paginationRequest = new UserPaginationRequest
         {
             PageCount = PaginationResult.PageCount,
-            PageNumber = PaginationResult.PageNumber
+            PageNumber = page,
         };
-        await LoadQuotes.InvokeAsync(paginationRequest);
+        await LoadUsers.InvokeAsync(paginationRequest);
         StateHasChanged();
     }
 }

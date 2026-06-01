@@ -59,7 +59,7 @@ namespace ACE_PC.BlazorServer.UseCases.Users
             var queryParams = new Dictionary<string, string?>
             {
                 {"PageCount" ,pagination?.PageCount.ToString() ?? "10" },
-                {"PageNumber",pagination?.PageNumber > 0 ? pagination.PageNumber.ToString(): "1" }
+                {"PageNumber",pagination?.PageNumber.ToString() ?? "1" }
             };
 
             var requestUri = QueryHelpers.AddQueryString("/api/users", queryParams);

@@ -24,6 +24,8 @@
         </PageTitleComponent>
 
         <UserListsComponent Users="UserDtos" />
+
+        <UsersPaginationComponent LoadUsers="LaodUsers" PaginationResult="PaginationResult" />
     }
 </section>
 
@@ -58,23 +60,29 @@
     {
         if (firstRender)
         {
-            var response = await UserUseCases.GetAllUsers(Pagination);
-            if (response.IsSuccess)
+            await this.LaodUsers(Pagination);
+            StateHasChanged();
+        }
+    }
+
+    private async Task LaodUsers(UserPaginationRequest pagination)
+    {
+        var response = await UserUseCases.GetAllUsers(pagination);
+        if (response.IsSuccess)
+        {
+            var users = response.Data!.UserDto;
+            var paginationResult = response.Data.PaginationResult;
+
+            if (users is not null || users!.Count > 0)
             {
-                var users = response.Data!.UserDto;
-                var paginationResult = response.Data.PaginationResult;
+                UserDtos = [.. users];
+                // StateHasChanged();
+            }
 
-                if (users is not null || users!.Count > 0)
-                {
-                    UserDtos = [.. users];
-                    StateHasChanged();
-                }
-
-                if (paginationResult is not null)
-                {
-                    PaginationResult = paginationResult;
-                    StateHasChanged();
-                }
+            if (paginationResult is not null)
+            {
+                PaginationResult = paginationResult;
+                // StateHasChanged();
             }
         }
     }

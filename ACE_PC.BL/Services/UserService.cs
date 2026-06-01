@@ -23,6 +23,35 @@ namespace ACE_PC.BL.Services
             _context = context;
         }
 
+
+        //DeleteUser
+        public async Task<ResultModel<UserDeleteResponse>> DeleteAsync(int id)
+        {
+            var responseModel = new ResultModel<UserDeleteResponse>();
+
+            var user = await _context.Users.AsNoTracking()
+                .FirstOrDefaultAsync(u=>u.UserId == id);
+
+            if (user is null)
+            {
+                responseModel = ResultModel<UserDeleteResponse>.ValidationError(404, "User Not found!");
+                goto skip;
+            }
+
+            _context.Users.Remove(user);
+            _context.Entry(user).State = EntityState.Deleted;
+            var result = await _context.SaveChangesAsync();
+
+            responseModel = result >= 1
+                ? ResultModel<UserDeleteResponse>.Success(200, "User Delete Success!",
+                new UserDeleteResponse { UserId = user.UserId, isDeleteSuccess = true })
+                : ResultModel<UserDeleteResponse>.SystemError(500, "Delete Fail");
+
+
+        skip:
+            return responseModel;
+        }
+
         //GetAllUsers
         public async Task<ResultModel<UsersResposne>> GetAllUses()
         {
@@ -81,7 +110,7 @@ namespace ACE_PC.BL.Services
             var pageNumber = pagination.PageNumber;
             var pageCount = pagination.PageCount;
             var skip = (pageNumber - 1) * pageCount;
-            var totalPage = (int)Math.Ceiling(userCount / (double)pageNumber);
+            var totalPage = (int)Math.Ceiling(userCount / (double)pageCount);
 
             var paginationResult = new UserPaginationResut
             {

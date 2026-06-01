@@ -1,4 +1,8 @@
-﻿@inject NavigationManager NavigationManager;
+﻿@using ACE_PC.BlazorServer.Dtos.Common
+@using ACE_PC.BlazorServer.Services
+
+@inject NavigationManager NavigationManager;
+@inject CommonUserInterfaceService CommonUserInterfaceService;
 
 <section>
     <MudDataGrid T="UserDto" Items="@Users"
@@ -84,10 +88,16 @@
     }
     public async Task Edit(UserDto userDto)
     {
-
+       
     }
     public async Task Delete(UserDto userDto)
     {
-
+        var dialogRequest = new DialogRequest
+        {
+            Body = "Are You sure wnat to delete",
+            ButtonText = "Delete",
+            Color = Color.Error
+        };
+        await CommonUserInterfaceService.ShowDialog(dialogRequest);
     }
 }
