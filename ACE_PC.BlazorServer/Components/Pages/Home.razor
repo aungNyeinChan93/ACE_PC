@@ -1,19 +1,23 @@
 ﻿@page "/"
-@using Newtonsoft.Json
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
 
 <AuthorizeView>
     <Authorized>
-        Welcome @context.User.Identity?.Name!
+        <div class="border-danger container mx-auto mt-10">
+            @* Welcome @context.User.Identity?.Name! *@
+            <BannerComponent Name="@context.User.Identity!.Name" />
+        </div>
+
         <pre>
             @* @(JsonConvert.SerializeObject(context.User)) *@
         </pre>
     </Authorized>
     <NotAuthorized>
-        Guest 
+        <div class="container mx-auto mt-4">
+            <BannerComponent />
+        </div>
     </NotAuthorized>
 </AuthorizeView>
 

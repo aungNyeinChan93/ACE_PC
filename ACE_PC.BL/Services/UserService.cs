@@ -23,7 +23,7 @@ namespace ACE_PC.BL.Services
             _context = context;
         }
 
-        //GetAllUses
+        //GetAllUsers
         public async Task<ResultModel<UsersResposne>> GetAllUses()
         {
             var responseModel = new ResultModel<UsersResposne>();
@@ -62,6 +62,72 @@ namespace ACE_PC.BL.Services
             var data = new UsersResposne
             {
                 UserDto = users
+            };
+
+            responseModel = ResultModel<UsersResposne>.Success(200, "Get All Uses", data);
+
+
+
+        skip:
+            return responseModel;
+        }
+
+        //GetAllUsersWithPagination
+        public async Task<ResultModel<UsersResposne>> GetAllUses(UserPaginationRequest pagination)
+        {
+            var responseModel = new ResultModel<UsersResposne>();
+
+            var userCount = await _context.Users.CountAsync();
+            var pageNumber = pagination.PageNumber;
+            var pageCount = pagination.PageCount;
+            var skip = (pageNumber - 1) * pageCount;
+            var totalPage = (int)Math.Ceiling(userCount / (double)pageNumber);
+
+            var paginationResult = new UserPaginationResut
+            {
+                ItemCount = userCount,
+                PageCount = pageCount,
+                PageNumber = pageNumber,
+                TotalPage= totalPage,
+            };
+
+            var users = await _context.Users
+                .Include(u => u.Role)!
+                .Include(u => u.Quotes)!
+                .Include(u => u.Comments)!.ThenInclude(c => c.Quote)
+                .Include(u => u.Comments)!.ThenInclude(c => c.User)
+                .Include(u => u.Likes)!.ThenInclude(l => l.Quote)!.ThenInclude(q => q!.User)!
+                .Include(u => u.Likes)!.ThenInclude(l => l.User)!
+                .Select(u => new UserDto
+                {
+                    UserId = u.UserId,
+                    Name = u.Name,
+                    Email = u.Email,
+                    Role = u.Role,
+                    Quotes = u.Quotes,
+                    Comments = u.Comments!.Select(c => new CommentDto
+                    {
+                        Id = c.CommentId,
+                        Content = c.Body,
+                        UserName = c.User!.Name
+                    }).ToList(),
+                    Likes = u.Likes!.ToList(),
+                    LikeQuotes = u.Likes!.Select(l => l.Quote).ToList()!
+                })
+                .Skip(skip)
+                .Take(pageCount)
+                .ToListAsync();
+
+            if (users is null || users.Count <= 0)
+            {
+                responseModel = ResultModel<UsersResposne>.ValidationError(400, "Users Not found!");
+                goto skip;
+            }
+
+            var data = new UsersResposne
+            {
+                UserDto = users,
+                PaginationResult = paginationResult
             };
 
             responseModel = ResultModel<UsersResposne>.Success(200, "Get All Uses", data);

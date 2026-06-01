@@ -1,0 +1,55 @@
+﻿
+
+<section>
+    <MudDataGrid T="UserDto" Items="@Users"
+                 Hover="true"
+                 Dense="false"
+                 Striped="true"
+                 Bordered="true"
+                 Filterable="false">
+
+        <Columns>
+
+            <PropertyColumn Property="x => x.UserId" Title="UserId" />
+
+            <PropertyColumn Property="x => x.Name" Title="User Name" />
+
+            <PropertyColumn Property="x => x.Email" Title="Email" />
+
+            <TemplateColumn Title="Role">
+                <CellTemplate>
+                    <MudChip Color="Color.Primary" Size="Size.Small">
+                        @context.Item.Role?.Name
+                    </MudChip>
+                </CellTemplate>
+            </TemplateColumn>
+
+            <TemplateColumn Title="Stats">
+                <CellTemplate>
+                    <MudStack Row="true" Spacing="1">
+                        <MudChip Size="Size.Small">
+                            Quotes : @(context.Item.Quotes?.Count ?? 0)
+                        </MudChip>
+
+                        <MudChip Size="Size.Small">
+                            Comments : @(context.Item.Comments?.Count ?? 0)
+                        </MudChip>
+
+                        <MudChip Size="Size.Small">
+                            Likes : @(context.Item.Likes?.Count ?? 0)
+                        </MudChip>
+                    </MudStack>
+                </CellTemplate>
+            </TemplateColumn>
+
+
+
+        </Columns>
+
+    </MudDataGrid>
+</section>
+
+@code {
+    [Parameter]
+    public List<UserDto> Users { get; set; } = new();
+}

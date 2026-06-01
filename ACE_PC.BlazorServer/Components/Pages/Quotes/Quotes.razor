@@ -1,9 +1,12 @@
 ﻿@page "/quotes"
 
 @inject QuoteUseCases QuoteUseCases;
-@attribute [Authorize];
 @inject NavigationManager NavigationManager
 @attribute [StreamRendering]
+@attribute [Authorize];
+
+
+<PageTitle> Quotes </PageTitle>
 
 <section>
    @if (MyQuotes is null)
@@ -13,16 +16,33 @@
     else
     {
     <div class="container">
-        <h3 class="text-info mb-3">Quotes List</h3>
+            <PageTitleComponent TitleModel="QuoteTitle">
+                @* <Actions>
+                    <button @onclick="@(() => NavigationManager.NavigateTo("/quotes/create"))" type="button" class="btn btn-primary ">
+                        <i class="bi bi-plus-lg"></i> Create
+                    </button>
+                </Actions> *@
+            </PageTitleComponent>
 
-        <div>
-            <button @onclick="@(() => NavigationManager.NavigateTo("/quotes/create"))" type="button" class="btn btn-primary">
-                <i class="bi bi-plus-lg"></i> Create
-            </button>
-        </div>
-        <QuoteSearchComponent OnSearchCompleted="HandleSearchCompleted" />
-    </div>
-    <QuoteTableComponent LaodQuotes="LoadQuotes" Quotes="MyQuotes" />
+
+            <div class="container pt-4">
+                <div class="row">
+                    <div class="col-12 col-lg-6">
+                        <button @onclick="@(() => NavigationManager.NavigateTo("/quotes/create"))" type="button" class="btn btn-primary ">
+                            <i class="bi bi-plus-lg"></i> Create
+                        </button>
+                    </div>
+                    <div class="col-12 col-lg-6">
+                        <QuoteSearchComponent OnSearchCompleted="HandleSearchCompleted" />
+                    </div>
+                </div>
+            </div>
+            <!-- Quote Table-->      
+            <QuoteTableComponent LaodQuotes="LoadQuotes" Quotes="MyQuotes" />
+
+            <!-- Quotes Pagination -->
+            <QuotespaginationComponent/>
+          </div>
     }
 </section>
 
@@ -35,6 +55,13 @@
 </pre>
 
 @code {
+
+    public BaseTitle QuoteTitle { get; set; } = new BaseTitle
+    {
+        Title = "Quote Lists",
+        Subtitle= "",
+        Icon=""
+    };
 
     public List<QuotesDto>? MyQuotes { get; set; }
 

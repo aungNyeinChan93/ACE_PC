@@ -1,13 +1,95 @@
 ﻿@page "/logout"
+
 @inject AuthenticationStateProvider AuthenticationStateProvider;
 @inject AuthUseCase AuthUseCase
 @inject NavigationManager NavigationManager;
 
 
+
+<section class="min-vh-100 d-flex align-items-center bg-light">
+
+    <div class="container">
+
+        <div class="row justify-content-center">
+
+            <div class="col-12 col-md-6 col-lg-4">
+
+                <div class="card border-0 text-center shadow-lg">
+
+                    <div class="card-body p-4">
+
+                        <div class="mb-3">
+                            <i class="bi bi-box-arrow-right text-danger fs-1"></i>
+                        </div>
+
+                        <h4 class="fw-bold">Logout</h4>
+
+                        <p class="text-muted">
+                            Are you sure you want to logout from your account?
+                        </p>
+
+                        <div class="d-grid mt-4 gap-2">
+
+                            <button class="btn btn-danger btn-lg"
+                                    @onclick="() => LogoutModal?.Show()">
+                                Logout
+                            </button>
+
+                            @* <a href="/" class="btn btn-outline-secondary btn-lg">
+                                Cancel
+                            </a> *@
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- Modal -->
+<AppModal @ref="LogoutModal">
+
+    <Title>
+        <span class="text-danger">Confirm Logout</span>
+    </Title>
+
+    <Body>
+        <p class="mb-0">
+            Are you sure you want to logout? You will need to login again to access your account.
+        </p>
+    </Body>
+
+    <Footer>
+
+        <button type="button"
+                @onclick="() => LogoutModal?.Close()"
+                class="btn btn-secondary">
+            Cancel
+        </button>
+
+        <button type="button"
+                @onclick="LogoutUser"
+                class="btn btn-danger">
+            Yes, Logout
+        </button>
+
+    </Footer>
+
+</AppModal>
+
 @code {
-    protected override async Task OnInitializedAsync()
+
+    public AppModal LogoutModal { get; set; } = new AppModal { ShowModal = true };
+
+    public async Task LogoutUser()
     {
-        // await ((CustomeAuthenticationProvider)AuthenticationStateProvider).MaskUserAsLogout();
         await AuthUseCase.Logout();
         NavigationManager.NavigateTo("/login");
     }

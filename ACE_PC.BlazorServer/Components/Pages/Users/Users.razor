@@ -1,0 +1,83 @@
+﻿@page "/users"
+@attribute [Authorize(Roles = "admin")]
+
+@inject UserUseCases UserUseCases;
+@using ACE_PC.BlazorServer.Components.Shared.User
+@using ACE_PC.Domain.Models.Users
+
+<PageTitle>User Lists</PageTitle>
+
+<section>
+
+    <PageTitleComponent TitleModel="UserTitle">
+        <Actions>
+            <button class="btn btn-primary">
+                <i class="bi bi-plus-lg"></i>
+                Create User
+            </button>
+        </Actions>
+    </PageTitleComponent>
+
+    @if (UserDtos is null)
+    {
+        <LoadingComponent />
+    }
+    else
+    {
+        <UserListsComponent Users="UserDtos" />
+    }
+
+</section>
+
+
+<br />
+<hr />
+<pre>
+    @(JsonConvert.SerializeObject(UserDtos, Formatting.Indented))
+    @(JsonConvert.SerializeObject(PaginationResult, Formatting.Indented))
+</pre>
+
+@code {
+
+    public BaseTitle UserTitle { get; set; } = new BaseTitle
+    {
+        Title = "User Management",
+        Subtitle = "Manage system users and roles ",
+        Icon = "bi bi-person-gear"
+    };
+
+    public List<UserDto>? UserDtos { get; set; }
+
+    public UserPaginationRequest Pagination { get; set; } = new UserPaginationRequest
+    {
+        PageCount = 10,
+        PageNumber = 1
+    };
+
+    public UserPaginationResut PaginationResult { get; set; } = new();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var response = await UserUseCases.GetAllUsers(Pagination);
+            if (response.IsSuccess)
+            {
+                var users = response.Data!.UserDto;
+                var paginationResult = response.Data.PaginationResult;
+
+                if (users is not null || users!.Count > 0)
+                {
+                    UserDtos = [.. users];
+                    StateHasChanged();
+                }
+
+                if (paginationResult is not null)
+                {
+                    PaginationResult = paginationResult;
+                    StateHasChanged();
+                }
+            }
+        }
+    }
+}

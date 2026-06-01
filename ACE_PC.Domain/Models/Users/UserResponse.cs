@@ -9,5 +9,6 @@ namespace ACE_PC.Domain.Models.Users
     public class UserResponse
     {
         public UserDto User { get; set; } = new ();
+        public UserPaginationResut? PaginationResult { get; set; }
     }
 }

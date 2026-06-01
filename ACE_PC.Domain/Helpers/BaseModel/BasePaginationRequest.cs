@@ -2,16 +2,12 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace ACE_PC.Domain.Models.Quotes
+namespace ACE_PC.Domain.Helpers.BaseModel
 {
-    public class  QuotePaginationRequest
+    public abstract class BasePaginationRequest
     {
         public int PageCount { get; set; } = 10;
 
         public int PageNumber { get; set; } = 1;
-
-        //public int TotalPage { get; set; }
-
-        //public int ItemCount { get; set; }
     }
 }
