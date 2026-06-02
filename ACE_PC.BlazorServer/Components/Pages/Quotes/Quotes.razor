@@ -1,6 +1,9 @@
 ﻿@page "/quotes"
 
 @attribute [Authorize(Roles = "user,admin")]
+@inject QuoteUseCases QuoteUseCases;
+@inject ISnackbar Snackbar;
+
 
 <section class="bg-light min-vh-100 py-5">
 
@@ -32,6 +35,64 @@
     </div>
 
 </section>
+
+<pre>
+    @(JsonConvert.SerializeObject(QuoteDtos,Formatting.Indented))
+</pre>
+
+
 @code {
+
+    public List<QuotesDto>? QuoteDtos { get; set; }
+
+    private async Task LoadQuotes()
+    {
+        try
+        {
+            var response = await QuoteUseCases.GetAllQuotes();
+            if (response.IsError)
+            {
+                if (response.ResponseType == Domain.Helpers.ReqResHelper.EnumResponseType.Pending)
+                {
+                    Snackbar.Add(response.ResponseMessage, Severity.Error);
+                    return;
+                }
+                if (response.ResponseType == Domain.Helpers.ReqResHelper.EnumResponseType.ValidationError)
+                {
+                    Snackbar.Add(response.ResponseMessage, Severity.Error);
+                    return;
+                }
+                if (response.ResponseType == Domain.Helpers.ReqResHelper.EnumResponseType.SystemError)
+                {
+                    Snackbar.Add(response.ResponseMessage, Severity.Error);
+                    return;
+                }
+            }
+
+            if (response.IsSuccess)
+            {
+                var quotes = response.Data!.Quotes;
+                if (quotes is not null)
+                {
+                    QuoteDtos = [.. quotes];
+                }
+
+            }
+        }
+        catch (Exception err)
+        {
+            Snackbar.Add(err.Message, Severity.Error);
+        }
+
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await this.LoadQuotes();
+            StateHasChanged();
+        }
+    }
 
 }
