@@ -1,109 +1,37 @@
 ﻿@page "/quotes"
 
-@inject QuoteUseCases QuoteUseCases;
-@inject NavigationManager NavigationManager
-@attribute [StreamRendering]
-@attribute [Authorize];
+@attribute [Authorize(Roles = "user,admin")]
 
+<section class="bg-light min-vh-100 py-5">
 
-<PageTitle> Quotes </PageTitle>
-
-<section>
-   @if (MyQuotes is null)
-    {
-        <LoadingComponent/>
-    }
-    else
-    {
     <div class="container">
 
-            <!-- Quote Title-->
-            <PageTitleComponent TitleModel="QuoteTitle">
-                @* <Actions>
-                    <button @onclick="@(() => NavigationManager.NavigateTo("/quotes/create"))" type="button" class="btn btn-primary ">
-                        <i class="bi bi-plus-lg"></i> Create
-                    </button>
-                </Actions> *@
-            </PageTitleComponent>
+        <!-- Header -->
+        <div class="mb-5 text-center">
+            <h1 class="fw-bold">Quotes Collection</h1>
+            <p class="text-muted">
+                Discover inspiring quotes from our community.
+            </p>
+        </div>
 
-            <!-- Quote Search-->
-            <div class="container pt-4">
-                <div class="row">
-                    <div class="col-12 col-lg-6">
-                        <button @onclick="@(() => NavigationManager.NavigateTo("/quotes/create"))" type="button" class="btn btn-primary ">
-                            <i class="bi bi-plus-lg"></i> Create
-                        </button>
-                    </div>
-                    <div class="col-12 col-lg-6">
-                        <QuoteSearchComponent OnSearchCompleted="HandleSearchCompleted" />
+        <!-- Quotes Grid -->
+        <div class="row g-4">
+
+            @for (int i = 0; i < 6; i++)
+            {
+                <div class="col-12 col-md-6 col-xl-4">
+                    <div class="h-100">
+                        @* <QuoteCardComponent /> *@
+                        <QuoteCard2Component />
                     </div>
                 </div>
-            </div>
-
-            <!-- Quote Table-->      
-            <QuoteTableComponent LaodQuotes="LoadQuotes"  Quotes="MyQuotes" />
-
-            <!-- Quotes Pagination -->
-            <QuotespaginationComponent LoadQuotes="LoadQuotes" PaginationResult="PaginationResult" />
-          </div>
-    }
-</section>
-
-
-<br />
-<hr />
-<pre>
-     @* @(JsonConvert.SerializeObject(MyQuotes, Formatting.Indented)) *@
-     @* @(JsonConvert.SerializeObject(PaginationResult, Formatting.Indented)) *@
-</pre>
-
-
-@code {
-
-    public BaseTitle QuoteTitle { get; set; } = new BaseTitle
-    {
-        Title = "Quote Lists",
-        Subtitle= "Learn,Think and Code",
-        Icon = "bi bi-chat-square-quote-fill"
-    };
-
-    public List<QuotesDto>? MyQuotes { get; set; }
-
-    public QuotesPaginationResult? PaginationResult { get; set; }
-
-    public QuotePaginationRequest PaginationRequest { get; set; } = new QuotePaginationRequest
-    {
-        PageCount = 10,
-        PageNumber = 1
-    };
-
-    protected override async Task OnInitializedAsync()
-    {
-        await this.LoadQuotes(PaginationRequest);
-
-    }
-
-    public async Task LoadQuotes(QuotePaginationRequest pagination)
-    {
-        await Task.Delay(300);
-
-        var response = await QuoteUseCases.GetAllQuotes(paginationRequest: pagination);
-        if (response.IsSuccess)
-        {
-            PaginationResult = response?.Data?.PaginationResult;
-            var quotes = response?.Data!.Quotes;
-            if (quotes is not null)
-            {
-                // MyQuotes.Clear();
-                MyQuotes = [.. quotes];
             }
-        }
-    }
 
-    private void HandleSearchCompleted(List<QuotesDto> filteredQuotes)
-    {
-        MyQuotes = [.. filteredQuotes];
-    }
+        </div>
 
+    </div>
+
+</section>
+@code {
 
 }
