@@ -1,5 +1,4 @@
-﻿@inject QuoteUseCases QuoteUseCases
-@inject ISnackbar Snackbar;
+﻿@inject UserUseCases UserUseCases;
 
 <div class="d-flex align-items-center rounded-pill border bg-white px-3 py-1 shadow-sm">
 
@@ -10,7 +9,7 @@
     <input @bind="SearchKey"
            @bind:event="oninput"
            class="form-control border-0 bg-transparent p-2 shadow-none"
-           placeholder="Search quotes, authors..." />
+           placeholder="Search name, email..." />
 
     @if (!string.IsNullOrEmpty(SearchKey))
     {
@@ -32,32 +31,36 @@
 </div>
 
 @code {
+
+
     [Parameter]
-    public EventCallback<List<QuotesDto>> OnSearchCompleted { get; set; }
+    public EventCallback<List<UserDto>> OnSearch { get; set; }
 
     public string SearchKey { get; set; } = "";
 
     private async Task ExecuteSearch()
     {
-        var request = new QuoteSearchRequest
+        var request = new UserSearchRequest
         {
-            QuoteTitle = SearchKey,
-            AuthorName = SearchKey,
+            Name = SearchKey,
+            Email = SearchKey,
         };
 
-        try
+        var pagination = new UserPaginationRequest
         {
-            var response = await QuoteUseCases.GetBySearchKey(searchReq: request);
-            if (response.IsSuccess && response.Data?.Quotes is not null)
+            PageCount = 10,
+            PageNumber = 1
+        };
+
+        var response = await UserUseCases.GetUsersBySearch(pagination, request);
+        if (response.IsSuccess)
+        {
+            if (response.Data!.UserDto is not null)
             {
-                await OnSearchCompleted.InvokeAsync(response.Data.Quotes);
+                await OnSearch.InvokeAsync(response.Data.UserDto);
+
             }
         }
-        catch (Exception err)
-        {
-            Snackbar.Add(err.mess);
-        }
-       
     }
 
     private async Task ClearSearch()

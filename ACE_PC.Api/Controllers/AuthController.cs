@@ -18,6 +18,8 @@ namespace ACE_PC.Api.Controllers
             _authService = authService;
         }
 
+
+        //Register
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequest request)
         {

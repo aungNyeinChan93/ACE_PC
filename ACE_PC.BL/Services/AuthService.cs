@@ -27,6 +27,7 @@ namespace ACE_PC.BL.Services
             _configuration = configuration;
         }
 
+        //Register
         public async Task<ResultModel<RegisterResponse>> RegisterAsync(RegisterRequest request)
         {
 

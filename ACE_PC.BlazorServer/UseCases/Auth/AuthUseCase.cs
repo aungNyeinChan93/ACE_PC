@@ -21,6 +21,8 @@ namespace ACE_PC.BlazorServer.UseCases.Auth
             _AuthStateProvider = authStateProvider;
         }
 
+
+        //Login
         public async Task<ResultModel<LoginResponse>> LoginAsync(LoginRequest request)
         {
             var response = await _httpClient.PostAsJsonAsync("/api/auth/login",request);
@@ -49,9 +51,24 @@ namespace ACE_PC.BlazorServer.UseCases.Auth
             return default!;
         }
         
+
+        //Logout
         public async Task Logout()
         {
             await ((CustomeAuthenticationProvider)_AuthStateProvider).MaskUserAsLogout();
+        }
+
+        //Register
+        public async Task<ResultModel<RegisterResponse>> Register(RegisterRequest request)
+        {
+            var response = await _httpClient.PostAsJsonAsync("/api/auth/register",request);
+            if (response.IsSuccessStatusCode)
+            {
+                var resStr = await response.Content.ReadAsStringAsync();
+                var result = JsonConvert.DeserializeObject<ResultModel<RegisterResponse>>(resStr);
+                return result!;
+            }
+            return default!;
         }
     }
 }

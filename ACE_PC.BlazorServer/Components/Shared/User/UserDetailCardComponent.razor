@@ -1,0 +1,162 @@
+﻿@using ACE_PC.Domain.Dtos.Users
+
+@if (User is not null)
+{
+    <div class="container py-4">
+
+        <!-- Profile Card -->
+        <div class="card mb-4 border-0 shadow-sm">
+            <div class="card-body">
+
+                <div class="d-flex align-items-center">
+
+                    <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white"
+                         style="width:80px;height:80px;font-size:30px;">
+                        @User.Name.Substring(0, 1).ToUpper()
+                    </div>
+
+                    <div class="ms-4">
+                        <h3 class="mb-1">@User.Name</h3>
+                        <p class="text-muted mb-1">@User.Email</p>
+
+                        <span class="badge bg-danger">
+                            @User.Role?.Name
+                        </span>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Statistics -->
+        <div class="row g-3 mb-4">
+
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <h2 class="text-primary">
+                            @(User.Quotes?.Count ?? 0)
+                        </h2>
+                        <p class="mb-0">Quotes</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <h2 class="text-success">
+                            @(User.Comments?.Count ?? 0)
+                        </h2>
+                        <p class="mb-0">Comments</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <h2 class="text-danger">
+                            @(User.Likes?.Count ?? 0)
+                        </h2>
+                        <p class="mb-0">Likes</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Quotes -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-chat-square-quote-fill me-2"></i>
+                    User Quotes
+                </h5>
+            </div>
+
+            <div class="card-body">
+
+                @if (User.Quotes?.Any() == true)
+                {
+                    <div class="list-group">
+
+                        @foreach (var quote in User.Quotes)
+                        {
+                            <div class="list-group-item">
+
+                                <h6 class="fw-bold">
+                                    @quote.Title
+                                </h6>
+
+                                <p class="text-muted mb-2">
+                                    @quote.Content
+                                </p>
+
+                                <span class="badge bg-secondary">
+                                    Quote ID: @quote.QuoteId
+                                </span>
+
+                                <span class="badge bg-info ms-2">
+                                    Category: @quote.CategoryId
+                                </span>
+
+                            </div>
+                        }
+
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-info">
+                        No quotes found.
+                    </div>
+                }
+
+            </div>
+        </div>
+
+    </div>
+}
+
+@code {
+
+    // [Parameter]
+    // public UserDto? User { get; set; }
+
+
+    // demeo
+    private UserDto User = new()
+    {
+        UserId = 2,
+        Name = "admin",
+        Email = "admin@123",
+        Role = new Role
+        {
+            RoleId = 2,
+            Name = "admin"
+        },
+        Quotes =
+    [
+        new Quote
+        {
+            QuoteId = 33,
+            Title = "Dolor dolorem ab rer",
+            Content = "Velit rerum beatae v"
+        },
+        new Quote
+        {
+            QuoteId = 34,
+            Title = "Vitae iusto doloremq",
+            Content = "Nemo illo dolor opti"
+        },
+        new Quote
+        {
+            QuoteId = 35,
+            Title = "Nulla minim nesciunt",
+            Content = "Officia tempore omn"
+        }
+    ]
+    };
+}

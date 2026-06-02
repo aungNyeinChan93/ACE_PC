@@ -30,7 +30,7 @@ namespace ACE_PC.BL.Services
             var responseModel = new ResultModel<UserDeleteResponse>();
 
             var user = await _context.Users.AsNoTracking()
-                .FirstOrDefaultAsync(u=>u.UserId == id);
+                .FirstOrDefaultAsync(u => u.UserId == id);
 
             if (user is null)
             {
@@ -167,6 +167,8 @@ namespace ACE_PC.BL.Services
             return responseModel;
         }
 
+
+
         // GetUserByEmail
         public async Task<ResultModel<UserResponse>> GetUserByEmail(string email)
         {
@@ -259,6 +261,97 @@ namespace ACE_PC.BL.Services
 
         skip:
             return responseModel;
+        }
+
+        //GetUsersByNameAnd
+        public async Task<ResultModel<UsersResposne>> GetAllUses(
+            UserPaginationRequest paginationRequest, UserSearchRequest request)
+        {
+            var responseModel = new ResultModel<UsersResposne>();
+
+            var userCount = await _context.Users.CountAsync();
+            var pageNumber = paginationRequest.PageNumber;
+            var pageCount = paginationRequest.PageCount;
+            var skip = (pageNumber - 1) * pageCount;
+            var totalPage = (int)Math.Ceiling(userCount / (double)pageCount);
+
+            var paginationResult = new UserPaginationResut
+            {
+                ItemCount = userCount,
+                PageCount = pageCount,
+                PageNumber = pageNumber,
+                TotalPage = totalPage,
+            };
+
+            var usersQuery = _context.Users
+                .Include(u => u.Role)
+                .Include(u => u.Quotes)!.ThenInclude(q => q.Likes)
+                .Include(u => u.Quotes)!.ThenInclude(q => q.Category)
+                .Include(u => u.Comments)!.ThenInclude(c => c.Quote)
+                .Include(u => u.Comments)!.ThenInclude(c => c.User)
+                .Include(u => u.Likes)!.ThenInclude(l => l.User)
+                .Include(u => u.Likes)!.ThenInclude(l => l.Quote)
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(request.Name) || !string.IsNullOrEmpty(request.Email))
+            {
+
+                usersQuery = usersQuery.Where(u =>
+                    (!string.IsNullOrEmpty(request.Name) && u.Name.Contains(request.Name))
+                    ||
+                    (!string.IsNullOrEmpty(request.Email) && u.Email.Contains(request.Email))
+                );
+            }
+
+            var users = await usersQuery
+                .Skip(skip)
+                .Take(pageCount)
+                .Select(u => new UserDto
+                {
+                    UserId = u.UserId,
+                    Email = u.Email,
+                    Role = u.Role,
+                    Quotes = u.Quotes,
+                    Comments = u.Comments!.Select(c => new CommentDto
+                    {
+                        Id = c.CommentId,
+                        Content = c.Body,
+                        UserName = c.User!.Name
+                    }).ToList(),
+                    Likes = u.Likes!.ToList(),
+                    LikeQuotes = u.Likes!.Select(l => new Quote
+                    {
+                        Title = l.Quote!.Title
+                    }).ToList(),
+                    Name = u.Name,
+                })
+                .ToListAsync();
+
+            //if (users is null || users.Count <= 0)
+            //{
+            //    responseModel = ResultModel<UsersResposne>.ValidationError(400, "Users Not found");
+            //    goto skip;
+            //}
+
+            var data = new UsersResposne
+            {
+                PaginationResult = new UserPaginationResut
+                {
+                    ItemCount = users.Count,
+                    PageCount = pageCount,
+                    PageNumber = pageNumber,
+                    TotalPage = totalPage
+                },
+                UserDto = users
+
+            };
+
+            responseModel = ResultModel<UsersResposne>.Success(200, "GetAll Users", data);
+
+        skip:
+            return responseModel;
+
+
         }
     }
 }

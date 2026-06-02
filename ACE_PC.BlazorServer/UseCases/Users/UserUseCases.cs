@@ -50,7 +50,7 @@ namespace ACE_PC.BlazorServer.UseCases.Users
                 return response.Data!.User;
             }
             return default!;
-        } 
+        }
 
         //GetAllUsers
         public async Task<ResultModel<UsersResposne>> GetAllUsers(UserPaginationRequest? pagination = default)
@@ -81,6 +81,35 @@ namespace ACE_PC.BlazorServer.UseCases.Users
         public async Task<ResultModel<UserDeleteResponse>> DeleteAsync(int id)
         {
             var response = await _httpClient.DeleteFromJsonAsync<ResultModel<UserDeleteResponse>>($"/api/users/{id}"); ;
+            return response!;
+        }
+
+
+        //GetUsersBySearch
+        public async Task<ResultModel<UsersResposne>> GetUsersBySearch(UserPaginationRequest pagination, UserSearchRequest request)
+        {
+            await this.SetAuthHeader();
+            var queryParameter = new Dictionary<string, string?>
+            {
+                {"PageCount" , pagination?.PageCount.ToString() ?? "10"},
+                {"PageNumber" ,pagination?.PageNumber.ToString() ?? "1"  }
+            };
+
+            if (!string.IsNullOrEmpty(request.Name))
+            {
+               
+                queryParameter.Add("Name",request.Name);
+            }
+            if (!string.IsNullOrEmpty(request.Email))
+            {
+
+                queryParameter.Add("Email", request.Email);
+            }
+
+            var endPoint = QueryHelpers.AddQueryString("/api/users/search",queryParameter);
+
+            var response = await _httpClient.GetFromJsonAsync<ResultModel<UsersResposne>>(endPoint);
+
             return response!;
         }
 

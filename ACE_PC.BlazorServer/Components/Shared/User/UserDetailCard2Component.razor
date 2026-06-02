@@ -1,0 +1,249 @@
+﻿@page "/user-detail-demo"
+
+<div class="container py-4">
+
+    <!-- Profile -->
+    <div class="card mb-4 border-0 shadow-sm">
+        <div class="card-body">
+
+            <div class="d-flex align-items-center">
+
+                <div class="rounded-circle bg-primary d-flex justify-content-center align-items-center text-white"
+                     style="width:80px;height:80px;font-size:30px;">
+                    @User.Name[..1].ToUpper()
+                </div>
+
+                <div class="ms-4">
+                    <h3 class="mb-1">@User.Name</h3>
+                    <p class="text-muted mb-1">@User.Email</p>
+
+                    <span class="badge bg-danger">
+                        @User.Role.Name
+                    </span>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Statistics -->
+    <div class="row g-3 mb-4">
+
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <h2 class="text-primary">@User.Quotes.Count</h2>
+                    <p class="mb-0">Quotes</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <h2 class="text-success">@User.Comments.Count</h2>
+                    <p class="mb-0">Comments</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <h2 class="text-danger">@User.Likes.Count</h2>
+                    <p class="mb-0">Likes</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <h2 class="text-warning">@User.LikeQuotes.Count</h2>
+                    <p class="mb-0">Liked Quotes</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Tabs -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+
+            <ul class="nav nav-tabs mb-3">
+
+                <li class="nav-item">
+                    <button class="nav-link @(ActiveTab == "quotes" ? "active" : "")"
+                            @onclick='() => ActiveTab = "quotes"'>
+                        Quotes
+                    </button>
+                </li>
+
+                <li class="nav-item">
+                    <button class="nav-link @(ActiveTab == "comments" ? "active" : "")"
+                            @onclick='() => ActiveTab = "comments"'>
+                        Comments
+                    </button>
+                </li>
+
+                <li class="nav-item">
+                    <button class="nav-link @(ActiveTab == "liked" ? "active" : "")"
+                            @onclick='() => ActiveTab = "liked"'>
+                        Liked Quotes
+                    </button>
+                </li>
+
+            </ul>
+
+            @if (ActiveTab == "quotes")
+            {
+                @foreach (var quote in User.Quotes)
+                {
+                    <div class="card bg-light mb-2 border-0">
+                        <div class="card-body">
+                            <h6>@quote.Title</h6>
+                            <p class="text-muted mb-0">@quote.Content</p>
+                        </div>
+                    </div>
+                }
+            }
+
+            @if (ActiveTab == "comments")
+            {
+                @foreach (var comment in User.Comments)
+                {
+                    <div class="card bg-light mb-2 border-0">
+                        <div class="card-body">
+                            <p class="mb-1">@comment.Content</p>
+                            <small class="text-muted">
+                                Comment #@comment.CommentId
+                            </small>
+                        </div>
+                    </div>
+                }
+            }
+
+            @if (ActiveTab == "liked")
+            {
+                @foreach (var quote in User.LikeQuotes)
+                {
+                    <div class="card bg-light mb-2 border-0">
+                        <div class="card-body">
+                            <h6>@quote.Title</h6>
+                            <p class="text-muted mb-0">@quote.Content</p>
+                        </div>
+                    </div>
+                }
+            }
+
+        </div>
+    </div>
+
+</div>
+
+@code {
+
+    private string ActiveTab = "quotes";
+
+    private UserDetailViewModel User = new()
+    {
+        UserId = 2,
+        Name = "admin",
+        Email = "admin@123",
+
+        Role = new RoleViewModel
+        {
+            RoleId = 2,
+            Name = "admin"
+        },
+
+        Quotes =
+        [
+            new QuoteViewModel
+            {
+                QuoteId = 33,
+                Title = "Dolor dolorem ab rer",
+                Content = "Velit rerum beatae v"
+            },
+            new QuoteViewModel
+            {
+                QuoteId = 34,
+                Title = "Vitae iusto doloremq",
+                Content = "Nemo illo dolor opti"
+            }
+        ],
+
+        Comments =
+        [
+            new CommentViewModel
+            {
+                CommentId = 1,
+                Content = "This quote is very inspiring."
+            },
+            new CommentViewModel
+            {
+                CommentId = 2,
+                Content = "I completely agree with this idea."
+            },
+            new CommentViewModel
+            {
+                CommentId = 3,
+                Content = "Great perspective."
+            }
+        ],
+
+        Likes =
+        [
+            1, 2, 3, 4
+        ],
+
+        LikeQuotes =
+        [
+            new QuoteViewModel
+            {
+                QuoteId = 101,
+                Title = "Success is not final",
+                Content = "Failure is not fatal."
+            },
+            new QuoteViewModel
+            {
+                QuoteId = 102,
+                Title = "Code Every Day",
+                Content = "Consistency beats intensity."
+            }
+        ]
+    };
+
+    public class UserDetailViewModel
+    {
+        public int UserId { get; set; }
+        public string Name { get; set; } = "";
+        public string Email { get; set; } = "";
+        public RoleViewModel Role { get; set; } = new();
+        public List<QuoteViewModel> Quotes { get; set; } = [];
+        public List<CommentViewModel> Comments { get; set; } = [];
+        public List<int> Likes { get; set; } = [];
+        public List<QuoteViewModel> LikeQuotes { get; set; } = [];
+    }
+
+    public class RoleViewModel
+    {
+        public int RoleId { get; set; }
+        public string Name { get; set; } = "";
+    }
+
+    public class QuoteViewModel
+    {
+        public int QuoteId { get; set; }
+        public string Title { get; set; } = "";
+        public string Content { get; set; } = "";
+    }
+
+    public class CommentViewModel
+    {
+        public int CommentId { get; set; }
+        public string Content { get; set; } = "";
+    }
+}

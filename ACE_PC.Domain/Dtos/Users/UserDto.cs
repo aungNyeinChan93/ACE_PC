@@ -18,7 +18,7 @@ namespace ACE_PC.Domain.Dtos.Users
 
         public string Email { get; set; } = string.Empty;
 
-        public Role? Role { get; set; }
+        public Role? Role { get; set; } 
 
         public List<Quote>? Quotes { get; set; }
 

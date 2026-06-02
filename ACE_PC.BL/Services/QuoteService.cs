@@ -265,11 +265,11 @@ namespace ACE_PC.BL.Services
                 })
                 .ToListAsync();
 
-            if (quotes is null || quotes.Count < 0)
-            {
-                responseModel = ResultModel<QuotesResponse>.ValidationError(400, "Quotes Not Found!");
-                goto skip;
-            }
+            //if (quotes is null || quotes.Count <= 0)
+            //{
+            //    responseModel = ResultModel<QuotesResponse>.ValidationError(400, "Quotes Not Found!");
+            //    goto skip;
+            //}
 
             var data = new QuotesResponse
             {

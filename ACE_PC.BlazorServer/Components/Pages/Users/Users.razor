@@ -1,28 +1,35 @@
 ﻿@page "/users"
-@attribute [Authorize(Roles = "admin")]
 
+@attribute [Authorize(Roles = "admin")]
 @inject UserUseCases UserUseCases;
-@using ACE_PC.BlazorServer.Components.Shared.User
-@using ACE_PC.Domain.Models.Users
+@inject NavigationManager NavigationManager;
 
 <PageTitle>User Lists</PageTitle>
 
 <section>
     @if (UserDtos is null)
     {
-        
         <LoadingComponent />
     }
     else
     {
         <PageTitleComponent TitleModel="UserTitle">
             <Actions>
-                <button class="btn btn-primary">
+                <button @onclick="CreateUser" class="btn btn-primary">
                     <i class="bi bi-plus-lg"></i>
                     Create User
                 </button>
             </Actions>
         </PageTitleComponent>
+
+
+
+        <!--Search Bar-->
+        <div class="row">
+            <div class="col-12 col-lg-6 my-2 p-2">
+                <UserSearchComponent OnSearch="ExecuteSearch" />
+            </div>
+        </div>
 
         <UserListsComponent LaodUsers="LaodUsers" Users="UserDtos" />
 
@@ -86,5 +93,16 @@
                 // StateHasChanged();
             }
         }
+    }
+
+    private async Task CreateUser()
+    {
+        NavigationManager.NavigateTo("/register");
+    }
+
+
+    private async Task ExecuteSearch(List<UserDto> filterUsers)
+    {
+        UserDtos = [.. filterUsers];
     }
 }

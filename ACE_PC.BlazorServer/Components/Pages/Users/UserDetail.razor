@@ -9,13 +9,13 @@
     }
     else
     {
-        <h3>UserDetail @(UserId)</h3>
-
+        <PageTitleComponent TitleModel="TitleModel"></PageTitleComponent>
+        <UserDetailCard2Component />
     }
 </section>
 
 <pre>
-    @(JsonConvert.SerializeObject(User,Formatting.Indented))
+    @(JsonConvert.SerializeObject(User, Formatting.Indented))
 </pre>
 
 @code {
@@ -23,6 +23,13 @@
     public int UserId { get; set; }
 
     public UserDto? User { get; set; }
+
+    public BaseTitle TitleModel { get; set; } = new BaseTitle
+    {
+        Title = "Detail User ",
+        Subtitle = "User Information",
+        Icon = "bi bi-info-circle"
+    };
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {

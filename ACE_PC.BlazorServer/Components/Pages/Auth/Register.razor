@@ -1,0 +1,58 @@
+﻿@page "/register"
+
+@using ACE_PC.BlazorServer.Components.Shared.Auth
+@inject AuthUseCase AuthUseCase;
+@inject ISnackbar Snackbar;
+@inject NavigationManager NavigationManager;
+
+
+
+<section>
+    <h3>Register</h3>
+    <BaseRegisterComponent OnSubmit="CreateUser" />
+</section>
+
+@code {
+    private async Task CreateUser(User user)
+    {
+        var request = new RegisterRequest
+        {
+            Email = user.Email,
+            Name = user.Name,
+            Password = user.Password
+        };
+
+        try
+        {
+            var response = await AuthUseCase.Register(request);
+            if (response.IsError)
+            {
+                if (response.ResponseType == Domain.Helpers.ReqResHelper.EnumResponseType.Pending)
+                {
+                    Snackbar.Add(response.ResponseMessage);
+                    return;
+                }
+                if (response.ResponseType == Domain.Helpers.ReqResHelper.EnumResponseType.ValidationError)
+                {
+                    Snackbar.Add(response.ResponseMessage);
+                    return;
+                }
+                if (response.ResponseType == Domain.Helpers.ReqResHelper.EnumResponseType.SystemError)
+                {
+                    Snackbar.Add(response.ResponseMessage);
+                    return;
+                }
+            }
+            if (response.IsSuccess)
+            {
+                Snackbar.Add(response.ResponseMessage);
+                NavigationManager.NavigateTo("/login");
+                StateHasChanged();
+            }
+        }
+        catch (Exception err)
+        {
+            Snackbar.Add(err.Message);
+        }
+    }
+}

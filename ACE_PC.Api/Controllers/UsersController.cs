@@ -91,6 +91,29 @@ namespace ACE_PC.Api.Controllers
             return Ok(response);
         }
 
+        //GetAllUsersWithPagination
+        [HttpGet("search")]
+        public async Task<IActionResult> GetAllUsers([FromQuery] UserPaginationRequest paginationRequest, [FromQuery]UserSearchRequest request )
+        {
+            var response = await _userService.GetAllUses(paginationRequest,request);
+            if (response.IsError)
+            {
+                if (response.ResponseType == EnumResponseType.Pending)
+                {
+                    return StatusCode(102, response);
+                }
+                if (response.ResponseType == EnumResponseType.ValidationError)
+                {
+                    return StatusCode(400, response);
+                }
+                if (response.ResponseType == EnumResponseType.SystemError)
+                {
+                    return StatusCode(500, response);
+                }
+            }
+            return Ok(response);
+        }
+
         //GetUserById
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetUserById([FromRoute]int id)

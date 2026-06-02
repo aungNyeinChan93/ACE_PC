@@ -1,0 +1,125 @@
+﻿@using ACE_PC.Domain.Entity
+@using Microsoft.AspNetCore.Components.Forms
+
+<EditForm Model="@User" OnValidSubmit="CreateUserAsync">
+
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-header bg-white">
+            <h4 class="mb-0">
+                <i class="bi bi-person-plus-fill me-2"></i>
+                Create User
+            </h4>
+        </div>
+
+        <div class="card-body">
+
+            <div class="row g-3">
+
+                <!-- Name -->
+                <div class="col-md-6">
+                    <label class="form-label">Name</label>
+
+                    <InputText class="form-control"
+                               @bind-Value="User.Name" />
+
+                    <ValidationMessage For="@(() => User.Name)" />
+                </div>
+
+                <!-- Email -->
+                <div class="col-md-6">
+                    <label class="form-label">Email</label>
+
+                    <InputText class="form-control"
+                               @bind-Value="User.Email" />
+
+                    <ValidationMessage For="@(() => User.Email)" />
+                </div>
+
+                <!-- Password -->
+                <div class="col-md-6">
+                    <label class="form-label">Password</label>
+
+                    <InputText type="password"
+                               class="form-control"
+                               @bind-Value="User.Password" />
+
+                    <ValidationMessage For="@(() => User.Password)" />
+                </div>
+
+                <!-- Role -->
+                <div class="col-md-6">
+                    <label class="form-label">Role</label>
+
+                    <InputSelect class="form-select"
+                                 @bind-Value="User.RoleId">
+
+                        <option value="0">Select Role</option>
+
+                        @foreach (var role in Roles)
+                        {
+                            <option value="@role.RoleId">
+                                @role.Name
+                            </option>
+                        }
+
+                    </InputSelect>
+
+                    <ValidationMessage For="@(() => User.RoleId)" />
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="card-footer bg-white">
+
+            <div class="d-flex justify-content-end gap-2">
+
+                <button type="button"
+                        class="btn btn-outline-secondary"
+         2               @onclick="ResetForm">
+                    <i class="bi bi-arrow-counterclockwise"></i>
+                    Reset
+                </button>
+
+                <button type="submit"
+                        class="btn btn-primary">
+                    <i class="bi bi-check-lg"></i>
+                    Create User
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</EditForm>
+
+@code {
+
+    [Parameter]
+    public EventCallback<User> OnSubmit { get; set; }
+
+    public User User { get; set; } = new();
+
+    public List<Role> Roles { get; set; } =
+    [
+        new Role { RoleId = 1, Name = "User" },
+        new Role { RoleId = 2, Name = "Admin" }
+    ];
+
+    private async Task CreateUserAsync()
+    {
+        await OnSubmit.InvokeAsync(User);
+    }
+
+    private void ResetForm()
+    {
+        User = new User();
+    }
+}
