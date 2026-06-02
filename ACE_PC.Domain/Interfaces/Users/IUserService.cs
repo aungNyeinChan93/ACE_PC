@@ -17,5 +17,8 @@ namespace ACE_PC.Domain.Interfaces.Users
         Task<ResultModel<UsersResposne>> GetAllUses(UserPaginationRequest paginationRequest, UserSearchRequest request);
 
         Task<ResultModel<UserDeleteResponse>> DeleteAsync(int id);
+
+
+        Task<ResultModel<UserEditResponse>> UpdateUserAsync(int id,UserEditRequest request);
     }
 }

@@ -159,5 +159,29 @@ namespace ACE_PC.Api.Controllers
             }
             return Ok(response);
         }
+
+
+        //Update User
+        [HttpPut("{id:int}")]
+        public async Task<IActionResult> UpdateUser([FromRoute]int id,UserEditRequest request)
+        {
+            var response = await _userService.UpdateUserAsync(id,request);
+            if (response.IsError)
+            {
+                if (response.ResponseType == EnumResponseType.Pending)
+                {
+                    return StatusCode(102, response);
+                }
+                if (response.ResponseType == EnumResponseType.ValidationError)
+                {
+                    return StatusCode(400, response);
+                }
+                if (response.ResponseType == EnumResponseType.SystemError)
+                {
+                    return StatusCode(500, response);
+                }
+            }
+            return Ok(response);
+        }
     }
 }

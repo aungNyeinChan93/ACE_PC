@@ -58,12 +58,15 @@
                                                    Size="Size.Small"
                                                    OnClick="@(() => View(user.Item.UserId))" />
 
-                                    
-                                    <MudIconButton Icon="@Icons.Material.Filled.Edit"
-                                                   Color="Color.Primary"
-                                                   Size="Size.Small"
-                                                   OnClick="@(() => Edit(user.Item))" />
+                                    @if (user.Item.Role?.RoleId != 2 || user.Item.UserId == AuthUser.UserId)
+                                    {
+                                        <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                                                       Color="Color.Primary"
+                                                       Size="Size.Small"
+                                                       OnClick="@(() => Edit(user.Item))" />
+                                    }
 
+                                    
                                     @if (user.Item.UserId != AuthUser?.UserId && user.Item.Role!.Name != "admin")
                                     {
                                         <MudIconButton Icon="@Icons.Material.Filled.Delete"
@@ -103,7 +106,10 @@
         if (firstRender)
         {
             var authuser = await UserUseCases.GetAuthUser();
-            AuthUser = authuser ?? new();
+            if (authuser is not null)
+            {
+                AuthUser = authuser ?? new();
+            }
             StateHasChanged();
         }
     }
@@ -116,7 +122,7 @@
     }
     public async Task Edit(UserDto userDto)
     {
-
+        NavigationManager.NavigateTo($"/users/edit/{userDto.UserId}");
     }
 
     public async Task Delete(UserDto userDto)
@@ -131,8 +137,10 @@
             };
             var result = await CommonUserInterfaceService.ShowDialog(dialogRequest);
             if (result.Canceled) return;
+
             await this.DeleteUser(userDto.UserId);
             await LaodUsers.InvokeAsync();
+
             StateHasChanged();
         }
         catch (Exception err)
@@ -141,6 +149,7 @@
         }
 
     }
+
 
     public async Task DeleteUser(int id)
     {

@@ -1,0 +1,208 @@
+﻿@using ACE_PC.Domain.Entity
+@using Microsoft.AspNetCore.Components.Forms
+
+@inject UserUseCases UserUseCases;
+@inject ISnackbar Snackbar;
+@inject NavigationManager NavigationManager;
+
+
+<EditForm Model="@UserDto" OnValidSubmit="EditUserAction">
+
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-header my-3 bg-white">
+            <h4 class="mb-0">
+                <i class="bi bi-person-plus-fill me-2"></i>
+                Edit User
+            </h4>
+        </div>
+
+        <div class="card-body">
+
+            <div class="row g-3">
+
+                <!-- Name -->
+                <div class="col-md-6">
+                    <label class="form-label">Name</label>
+
+                    <InputText class="form-control"
+                               @bind-Value="UserDto.Name" />
+
+                    <ValidationMessage For="@(() => UserDto.Name)" />
+                </div>
+
+                <!-- Email -->
+                <div class="col-md-6">
+                    <label class="form-label">Email</label>
+
+                    <InputText class="form-control"
+                               @bind-Value="UserDto.Email" />
+
+                    <ValidationMessage For="@(() => UserDto.Email)" />
+                </div>
+
+                <!-- Password -->
+                <div class="col-md-6">
+                    <label class="form-label">Password</label>
+
+                    <InputText disabled="@isPasswordDisable" type="password"
+                               class="form-control"
+                               @bind-Value="UserDto.Password" />
+
+                    <ValidationMessage For="@(() => UserDto.Password)" />
+                </div>
+
+                
+                
+
+
+                <!-- Role -->
+                <div class="col-md-6">
+                    <label class="form-label">Role</label>
+
+                    <InputSelect class="form-select"
+                                 @bind-Value="UserDto.Role!.RoleId">
+
+                        <option value="0">Select Role</option>
+
+                        @foreach (var role in Roles)
+                        {
+                            <option value="@role.RoleId">
+                                @role.Name
+                            </option>
+                        }
+
+                    </InputSelect>
+
+                    <ValidationMessage For="@(() => UserDto.Role.RoleId)" />
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="card-footer bg-white">
+
+            <div class="d-flex justify-content-end gap-2">
+
+                @* <button type="button"
+                        class="btn btn-outline-secondary"
+                        2 @onclick="ResetForm">
+                    <i class="bi bi-arrow-counterclockwise"></i>
+                    Reset
+                </button> *@
+
+                
+                <a href="/users"
+                   class="btn btn-secondary">
+                    <i class="bi bi-skip-backward-circle"></i>
+                    Back
+                </a>
+
+
+                <button type="button"
+                        class="btn btn-outline-secondary"
+                        @onclick="() => isPasswordDisable = !isPasswordDisable">
+                    <span class="mx-2">
+                        @if (isPasswordDisable)
+                        {
+                            <i class="bi bi-unlock-fill"></i>
+                        }
+                        else
+                        {
+                            <i class="bi bi-lock"></i>
+                        }
+                    </span>
+                    @(isPasswordDisable ? "Change password" : "Lock")
+                </button>
+
+
+                <button type="submit"
+                        class="btn btn-primary">
+                    <i class="bi bi-check-lg"></i>
+                    Update User
+                </button>
+
+
+
+
+            </div>
+
+        </div>
+
+    </div>
+
+</EditForm>
+
+@code {
+
+    public bool isPasswordDisable { get; set; } = true;
+
+
+    [Parameter]
+    public UserDto UserDto { get; set; } = new();
+
+    //Need To Change Dynamic Role
+    public List<Role> Roles { get; set; } =
+    [
+        new Role { RoleId = 1, Name = "User" },
+        new Role { RoleId = 2, Name = "Admin" }
+    ];
+
+    private async Task EditUserAction()
+    {
+        try
+        {
+            var request = new UserEditRequest
+            {
+                Name = UserDto.Name,
+                Email = UserDto.Email,
+                RoleId = UserDto.Role!.RoleId,
+            };
+
+            if (!isPasswordDisable)
+            {
+                request.Password = UserDto.Password;
+            }
+
+            var response = await UserUseCases.UpdateAsync(UserDto.UserId, request);
+
+            if (response.IsError)
+            {
+                if (response.ResponseType == Domain.Helpers.ReqResHelper.EnumResponseType.Pending)
+                {
+                    Snackbar.Add(response.ResponseMessage);
+                    return;
+                }
+                if (response.ResponseType == Domain.Helpers.ReqResHelper.EnumResponseType.ValidationError)
+                {
+                    Snackbar.Add(response.ResponseMessage);
+                    return;
+                }
+                if (response.ResponseType == Domain.Helpers.ReqResHelper.EnumResponseType.SystemError)
+                {
+                    Snackbar.Add(response.ResponseMessage);
+                    return;
+                }
+            }
+            if (response.IsSuccess)
+            {
+                Snackbar.Add(response.ResponseMessage);
+                NavigationManager.NavigateTo("/users");
+                StateHasChanged();
+            }
+        }
+        catch (Exception err)
+        {
+            Snackbar.Add(err.Message, Severity.Error);
+        }
+    }
+
+    private void ResetForm()
+    {
+        UserDto = new UserDto();
+    }
+}

@@ -302,7 +302,7 @@ namespace ACE_PC.BL.Services
             updateQuote.CategoryId = request.CategoryId;
             //updateQuote.User = request.User;
             //updateQuote.Category = request.Category;
-
+                
 
             _context.Entry(updateQuote).State = EntityState.Modified;
             var result = await _context.SaveChangesAsync();

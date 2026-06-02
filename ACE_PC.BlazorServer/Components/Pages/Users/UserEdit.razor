@@ -1,0 +1,44 @@
+﻿@page "/users/edit/{userId:int}"
+
+@inject UserUseCases UserUseCases;
+
+
+<section>
+    @if (User is null)
+    {
+        <LoadingComponent/>
+    }
+    else
+    {
+        <UserEditComponent UserDto="User"/>
+    }
+</section>
+
+
+
+
+@code {
+    [Parameter]
+    public int UserId { get; set; }
+
+    public UserDto? User { get; set; }
+
+    private async Task GetUser()
+    {
+        var response = await UserUseCases.GetUserById(UserId);
+        if (response.IsSuccess)
+        {
+            var user =  response.Data!.User;
+            User = user ?? new();
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await this.GetUser();
+            StateHasChanged();
+        }        
+    }
+}

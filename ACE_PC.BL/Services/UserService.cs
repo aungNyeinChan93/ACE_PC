@@ -5,6 +5,7 @@ using ACE_PC.Domain.Entity;
 using ACE_PC.Domain.Helpers.ReqResHelper;
 using ACE_PC.Domain.Interfaces.Users;
 using ACE_PC.Domain.Models.Users;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -71,6 +72,7 @@ namespace ACE_PC.BL.Services
                     Email = u.Email,
                     Role = u.Role,
                     Quotes = u.Quotes,
+                    Password = u.Password,
                     Comments = u.Comments!.Select(c => new CommentDto
                     {
                         Id = c.CommentId,
@@ -134,6 +136,7 @@ namespace ACE_PC.BL.Services
                     Email = u.Email,
                     Role = u.Role,
                     Quotes = u.Quotes,
+                    Password = u.Password,
                     Comments = u.Comments!.Select(c => new CommentDto
                     {
                         Id = c.CommentId,
@@ -187,6 +190,7 @@ namespace ACE_PC.BL.Services
                     UserId = u.UserId,
                     Email = u.Email,
                     Role = u.Role,
+                    Password = u.Password,
                     Quotes = u.Quotes,
                     Comments = u.Comments!.Select(c => new CommentDto
                     {
@@ -235,6 +239,7 @@ namespace ACE_PC.BL.Services
                     Email = u.Email,
                     Role = u.Role,
                     Quotes = u.Quotes,
+                    Password = u.Password,
                     Comments = u.Comments!.Select(c => new CommentDto
                     {
                         Id = c.CommentId,
@@ -312,6 +317,7 @@ namespace ACE_PC.BL.Services
                     Email = u.Email,
                     Role = u.Role,
                     Quotes = u.Quotes,
+                    Password = u.Password,
                     Comments = u.Comments!.Select(c => new CommentDto
                     {
                         Id = c.CommentId,
@@ -348,10 +354,45 @@ namespace ACE_PC.BL.Services
 
             responseModel = ResultModel<UsersResposne>.Success(200, "GetAll Users", data);
 
-        skip:
+        //skip:
             return responseModel;
 
 
+        }
+
+
+        //Update User
+        public async Task<ResultModel<UserEditResponse>> UpdateUserAsync(int id,UserEditRequest request)
+        {
+            var responseModel = new ResultModel<UserEditResponse>();
+
+            var updateUser = await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.UserId == id);
+
+            if (updateUser is null)
+            {
+                responseModel = ResultModel<UserEditResponse>.ValidationError(404,"User not found!");
+                goto skip;
+            }
+
+            updateUser.Name = request.Name;
+            updateUser.Email = request.Email;
+            updateUser.RoleId = request.RoleId;
+
+            if (!string.IsNullOrEmpty(request.Password))
+            {
+                var hashPassword = new PasswordHasher<User>().HashPassword(updateUser,request.Password);
+                updateUser.Password = hashPassword;
+            }
+
+            _context.Entry(updateUser).State = EntityState.Modified;
+            var result = await _context.SaveChangesAsync();
+
+            responseModel = result >= 1
+                ? ResultModel<UserEditResponse>.Success(200, "User Update Success")
+                : ResultModel<UserEditResponse>.SystemError(500, "Invalid Request");
+
+        skip:
+            return responseModel;
         }
     }
 }

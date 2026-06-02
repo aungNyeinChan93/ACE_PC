@@ -6,6 +6,7 @@ using ACE_PC.Domain.Models.Users;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.AspNetCore.WebUtilities;
+using Newtonsoft.Json;
 using System.ClientModel.Primitives;
 using System.Net.Http.Headers;
 using System.Runtime.Serialization;
@@ -111,6 +112,21 @@ namespace ACE_PC.BlazorServer.UseCases.Users
             var response = await _httpClient.GetFromJsonAsync<ResultModel<UsersResposne>>(endPoint);
 
             return response!;
+        }
+
+        //UpdateUser
+        public async Task<ResultModel<UserEditResponse>> UpdateAsync(int id,UserEditRequest request)
+        {
+            await this.SetAuthHeader();
+            var response = await _httpClient.PutAsJsonAsync($"/api/users/{id}",request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var str = await response.Content.ReadAsStringAsync();
+                var result = JsonConvert.DeserializeObject<ResultModel<UserEditResponse>>(str);
+                return result!;
+            }
+            return default!;
         }
 
 
