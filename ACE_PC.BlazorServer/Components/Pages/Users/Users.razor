@@ -10,6 +10,7 @@
 <section>
     @if (UserDtos is null)
     {
+        
         <LoadingComponent />
     }
     else
@@ -23,7 +24,7 @@
             </Actions>
         </PageTitleComponent>
 
-        <UserListsComponent Users="UserDtos" />
+        <UserListsComponent LaodUsers="LaodUsers" Users="UserDtos" />
 
         <UsersPaginationComponent LoadUsers="LaodUsers" PaginationResult="PaginationResult" />
     }

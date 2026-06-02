@@ -77,6 +77,13 @@ namespace ACE_PC.BlazorServer.UseCases.Users
         }
 
 
+        //DeleteUser
+        public async Task<ResultModel<UserDeleteResponse>> DeleteAsync(int id)
+        {
+            var response = await _httpClient.DeleteFromJsonAsync<ResultModel<UserDeleteResponse>>($"/api/users/{id}"); ;
+            return response!;
+        }
+
 
     }
 }

@@ -1,84 +1,112 @@
-﻿@using ACE_PC.BlazorServer.Dtos.Common
-@using ACE_PC.BlazorServer.Services
-
-@inject NavigationManager NavigationManager;
+﻿@inject NavigationManager NavigationManager;
 @inject CommonUserInterfaceService CommonUserInterfaceService;
+@inject UserUseCases UserUseCases;
+@inject ISnackbar Snackbar;
 
 <section>
-    <MudDataGrid T="UserDto" Items="@Users"
-                 Hover="true"
-                 Dense="false"
-                 Striped="true"
-                 Bordered="true"
-                 Filterable="false">
+    <AuthorizeView Roles="admin">
+        <Authorized>
+            <div>
+                <MudDataGrid T="UserDto" Items="@Users"
+                             Hover="true"
+                             Dense="false"
+                             Striped="true"
+                             Bordered="true"
+                             Filterable="false">
 
-        <Columns>
+                    <Columns>
 
-            <PropertyColumn Property="x => x.UserId" Title="UserId" />
+                        <PropertyColumn Property="x => x.UserId" Title="UserId" />
 
-            <PropertyColumn Property="x => x.Name" Title="User Name" />
+                        <PropertyColumn Property="x => x.Name" Title="User Name" />
 
-            <PropertyColumn Property="x => x.Email" Title="Email" />
+                        <PropertyColumn Property="x => x.Email" Title="Email" />
 
-            <TemplateColumn Title="Role">
-                <CellTemplate>
-                    <MudChip Color="Color.Primary" Size="Size.Small">
-                        @context.Item.Role?.Name
-                    </MudChip>
-                </CellTemplate>
-            </TemplateColumn>
+                        <TemplateColumn Title="Role">
+                            <CellTemplate Context="user">
+                                <MudChip Color="Color.Primary" Size="Size.Small">
+                                    @user.Item.Role?.Name
+                                </MudChip>
+                            </CellTemplate>
+                        </TemplateColumn>
 
-            <TemplateColumn Title="Stats">
-                <CellTemplate>
-                    <MudStack Row="true" Spacing="1">
-                        <MudChip Size="Size.Small">
-                            Quotes : @(context.Item.Quotes?.Count ?? 0)
-                        </MudChip>
+                        <TemplateColumn Title="Stats">
+                            <CellTemplate Context="user">
+                                <MudStack Row="true" Spacing="1">
+                                    <MudChip Size="Size.Small">
+                                        Quotes : @(user.Item.Quotes?.Count ?? 0)
+                                    </MudChip>
 
-                        <MudChip Size="Size.Small">
-                            Comments : @(context.Item.Comments?.Count ?? 0)
-                        </MudChip>
+                                    <MudChip Size="Size.Small">
+                                        Comments : @(user.Item.Comments?.Count ?? 0)
+                                    </MudChip>
 
-                        <MudChip Size="Size.Small">
-                            Likes : @(context.Item.Likes?.Count ?? 0)
-                        </MudChip>
-                    </MudStack>
-                </CellTemplate>
-            </TemplateColumn>
+                                    <MudChip Size="Size.Small">
+                                        Likes : @(user.Item.Likes?.Count ?? 0)
+                                    </MudChip>
+                                </MudStack>
+                            </CellTemplate>
+                        </TemplateColumn>
 
-            <TemplateColumn Title="Actions">
-                <CellTemplate>
-                    <MudStack Row="true" Spacing="1">
+                        <TemplateColumn Title="Actions">
+                            <CellTemplate Context="user">
 
-                        <MudIconButton Icon="@Icons.Material.Filled.Visibility"
-                                       Color="Color.Info"
-                                       Size="Size.Small"
-                                       OnClick="@(() => View(context.Item.UserId))" />
+                                <MudStack Row="true" Spacing="1">
 
-                        <MudIconButton Icon="@Icons.Material.Filled.Edit"
-                                       Color="Color.Primary"
-                                       Size="Size.Small"
-                                       OnClick="@(() => Edit(context.Item))" />
+                                    <MudIconButton Icon="@Icons.Material.Filled.Visibility"
+                                                   Color="Color.Info"
+                                                   Size="Size.Small"
+                                                   OnClick="@(() => View(user.Item.UserId))" />
 
-                        <MudIconButton Icon="@Icons.Material.Filled.Delete"
-                                       Color="Color.Error"
-                                       Size="Size.Small"
-                                       OnClick="@(() => Delete(context.Item))" />
+                                    
+                                    <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                                                   Color="Color.Primary"
+                                                   Size="Size.Small"
+                                                   OnClick="@(() => Edit(user.Item))" />
 
-                    </MudStack>
-                </CellTemplate>
-            </TemplateColumn>
+                                    @if (user.Item.UserId != AuthUser?.UserId && user.Item.Role!.Name != "admin")
+                                    {
+                                        <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                                       Color="Color.Error"
+                                                       Size="Size.Small"
+                                                       OnClick="@(() => Delete(user.Item))" />
+                                    }
+
+                                    
+                                </MudStack>
+
+                            </CellTemplate>
+                        </TemplateColumn>
 
 
 
-        </Columns>
+                    </Columns>
 
-    </MudDataGrid>
+                </MudDataGrid>
+            </div>
+        </Authorized>
+    </AuthorizeView>
+
 </section>
 
 @code {
     [Parameter]
     public List<UserDto> Users { get; set; } = new();
+
+    public UserDto AuthUser { get; set; } = new();
+
+    [Parameter]
+    public EventCallback<UserPaginationRequest> LaodUsers { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var authuser = await UserUseCases.GetAuthUser();
+            AuthUser = authuser ?? new();
+            StateHasChanged();
+        }
+    }
 
     public async Task View(int id)
     {
@@ -88,16 +116,65 @@
     }
     public async Task Edit(UserDto userDto)
     {
-       
+
     }
+
     public async Task Delete(UserDto userDto)
     {
-        var dialogRequest = new DialogRequest
+        try
         {
-            Body = "Are You sure wnat to delete",
-            ButtonText = "Delete",
-            Color = Color.Error
-        };
-        await CommonUserInterfaceService.ShowDialog(dialogRequest);
+            var dialogRequest = new DialogRequest
+            {
+                Body = "Are you sure to delete?",
+                ButtonText = "Delete",
+                Color = Color.Error
+            };
+            var result = await CommonUserInterfaceService.ShowDialog(dialogRequest);
+            if (result.Canceled) return;
+            await this.DeleteUser(userDto.UserId);
+            await LaodUsers.InvokeAsync();
+            StateHasChanged();
+        }
+        catch (Exception err)
+        {
+            Snackbar.Add(err.Message);
+        }
+
+    }
+
+    public async Task DeleteUser(int id)
+    {
+        try
+        {
+            var response = await UserUseCases.DeleteAsync(id);
+            if (response.IsError)
+            {
+                if (response.ResponseType == Domain.Helpers.ReqResHelper.EnumResponseType.Pending)
+                {
+                    Snackbar.Add(response.ResponseMessage);
+                    return;
+                }
+                if (response.ResponseType == Domain.Helpers.ReqResHelper.EnumResponseType.ValidationError)
+                {
+                    Snackbar.Add(response.ResponseMessage);
+                    return;
+                }
+                if (response.ResponseType == Domain.Helpers.ReqResHelper.EnumResponseType.SystemError)
+                {
+                    Snackbar.Add(response.ResponseMessage);
+                    return;
+                }
+            }
+            if (response.IsSuccess)
+            {
+                Snackbar.Add(response.ResponseMessage);
+                return;
+            }
+        }
+        catch (Exception err)
+        {
+            Snackbar.Add(err.Message);
+        }
+
     }
 }
