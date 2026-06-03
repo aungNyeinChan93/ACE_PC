@@ -20,5 +20,7 @@ namespace ACE_PC.Domain.Interfaces.Quotes
 
         Task<ResultModel<DeleteQuoteResponse>> DeleteAsync(int id);
 
+        Task<ResultModel<QuotesResponse>> GetByAuthorIdAsync(int id,QuotePaginationRequest? pagination = default!);
+
     }
 }

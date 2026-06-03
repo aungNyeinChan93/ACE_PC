@@ -1,0 +1,195 @@
+﻿<div class="container py-5">
+
+    <div class="row justify-content-center">
+
+        @foreach (var quote in MyQuotes)
+        {
+            <div class="col-lg-10 mb-4">
+
+                <div class="card blog-card border-0 shadow-lg">
+
+                    <!-- Header -->
+                    <div class="card-body">
+
+                        <div class="d-flex justify-content-between align-items-start">
+
+                            <!-- Author -->
+                            <div class="d-flex align-items-center">
+
+                                <div class="avatar me-3">
+                                    @quote.Author[..1].ToUpper()
+                                </div>
+
+                                <div>
+                                    <h6 class="fw-bold text-primary mb-0">@quote.Author</h6>
+                                    <small class="text-muted">
+                                        @DateTime.Now.ToString("dd MMM yyyy")
+                                    </small>
+                                </div>
+
+                            </div>
+
+                            <!-- Category Badge -->
+                            <span class="badge rounded-pill bg-gradient bg-info text-dark px-3 py-2 shadow-sm">
+                                @quote.Category
+                            </span>
+
+                        </div>
+
+                        <!-- Title -->
+                        <h3 class="fw-bold text-dark mt-4">
+                            @quote.Title
+                        </h3>
+
+                        <!-- Content -->
+                        <p class="text-secondary fs-6 mt-3">
+                            @quote.Content
+                        </p>
+
+                        <hr />
+
+                        <!-- Actions -->
+                        <div class="d-flex justify-content-between align-items-center">
+
+                            <div class="d-flex gap-3">
+
+                                <button disabled class="btn btn-outline-danger btn-sm rounded-pill px-3">
+                                    <i class="bi bi-heart-fill me-1"></i>
+                                    @quote.Likes.Count
+                                </button>
+
+                                <button class="btn btn-outline-primary btn-sm rounded-pill px-3"
+                                        @onclick="() => ToggleComments(quote.Id)">
+
+                                    <i class="bi bi-chat-dots me-1"></i>
+                                    @quote.Comments.Count Comments
+
+                                    <i class="bi @(ExpandedPosts.Contains(quote.Id)
+                                                                               ? "bi-chevron-up"
+                                                                               : "bi-chevron-down") ms-1"></i>
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                        <!-- Comments -->
+                        @if (ExpandedPosts.Contains(quote.Id))
+                        {
+                            <div class="mt-4">
+
+                                <h6 class="fw-bold text-primary mb-3">
+                                    Comments (@quote.Comments.Count)
+                                </h6>
+
+                                @if (quote.Comments.Any())
+                                {
+                                    @foreach (var comment in quote.Comments)
+                                    {
+                                        <div class="comment-box mb-3 shadow-sm">
+
+                                            <div class="d-flex">
+
+                                                <div class="comment-avatar me-3">
+                                                    @comment.UserName[..1].ToUpper()
+                                                </div>
+
+                                                <div class="flex-grow-1">
+
+                                                    <div class="fw-semibold text-dark">
+                                                        @comment.UserName
+                                                    </div>
+
+                                                    <div class="text-muted">
+                                                        @comment.Content
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="alert alert-info rounded-pill border-0 text-center">
+                                        No comments yet.
+                                    </div>
+                                }
+
+                            </div>
+                        }
+
+                    </div>
+
+                </div>
+
+            </div>
+        }
+
+    </div>
+
+</div>
+
+@code {
+    [Parameter]
+    public List<QuotesDto> MyQuotes { get; set; } = new();
+
+    private HashSet<int> ExpandedPosts = new();
+
+    private void ToggleComments(int postId)
+    {
+        if (!ExpandedPosts.Add(postId))
+        {
+            ExpandedPosts.Remove(postId);
+        }
+    }
+}
+
+<style>
+    .blog-card {
+        border-radius: 18px;
+        transition: all .3s ease;
+        background: linear-gradient(135deg, #ffffff, #f8f9fa);
+    }
+
+        .blog-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,.1);
+        }
+
+    .avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #0d6efd, #6610f2);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 1.1rem;
+        box-shadow: 0 4px 8px rgba(0,0,0,.2);
+    }
+
+    .comment-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #f1f3f5, #e9ecef);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        color: #495057;
+    }
+
+    .comment-box {
+        padding: 14px;
+        border-radius: 12px;
+        background: #ffffff;
+        border-left: 4px solid #0d6efd;
+    }
+</style>

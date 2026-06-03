@@ -1,0 +1,131 @@
+﻿@page "/quotes/myQuotes"
+@inject QuoteUseCases QuoteUseCases;
+@inject UserUseCases UserUseCases;
+@inject ISnackbar Snackbar;
+
+
+
+<section>
+    @if (MyQuotes is null)
+    {
+        <LoadingComponent />
+    }
+    else
+    {
+        <!-- Quotes Lists -->
+        <PageTitleComponent TitleModel="TitleModel">
+
+        </PageTitleComponent>
+
+        <!-- Quotes Lists -->
+        <QuotesCardByAuthorComponent MyQuotes="MyQuotes" />
+
+        <!-- Pagination -->
+        <div>
+            <QuotespaginationComponent LoadQuotes="LoadOurQuotes" PaginationResult="PaginationResult" />
+        </div>
+    }
+</section>
+
+@*
+<pre>
+     @(JsonConvert.SerializeObject(MyQuotes, Formatting.Indented))
+      @(JsonConvert.SerializeObject(PaginationResult, Formatting.Indented))
+</pre>
+ *@
+
+    
+
+@code {
+
+    public BaseTitle TitleModel { get; set; } = new BaseTitle
+    {
+        Title = "Our Quotes",
+        Subtitle = "Make & Share Your Idea and Knowledge!",
+        Icon = "bi bi-chat-quote-fill"
+
+    };
+
+    public List<QuotesDto>? MyQuotes { get; set; }
+
+    public UserDto AuthUser { get; set; } = new();
+
+    public QuotesPaginationResult PaginationResult { get; set; } = new();
+
+    private async Task LoadAuthUser()
+    {
+        try
+        {
+            var response = await UserUseCases.GetAuthUser();
+            if (response is null)
+            {
+                Snackbar.Add("AuthUser is invalid!", Severity.Error);
+                return;
+            }
+            AuthUser = response ?? new();
+            // StateHasChanged();
+        }
+        catch (Exception err)
+        {
+            Snackbar.Add(err.Message, Severity.Error);
+        }
+    }
+
+    private async Task LoadOurQuotes(QuotePaginationRequest pagination)
+    {
+        try
+        {
+            var response = await QuoteUseCases.GetQuotesByAuthorId(AuthUser.UserId, pagination);
+            if (response.IsError)
+            {
+                if (response.ResponseType == Domain.Helpers.ReqResHelper.EnumResponseType.Pending)
+                {
+                    Snackbar.Add(response.ResponseMessage, Severity.Error);
+                    return;
+                }
+                if (response.ResponseType == Domain.Helpers.ReqResHelper.EnumResponseType.ValidationError)
+                {
+                    Snackbar.Add(response.ResponseMessage, Severity.Error);
+                    return;
+                }
+                if (response.ResponseType == Domain.Helpers.ReqResHelper.EnumResponseType.SystemError)
+                {
+                    Snackbar.Add(response.ResponseMessage, Severity.Error);
+                    return;
+                }
+            }
+            if (response.IsSuccess)
+            {
+                if (response.Data is not null)
+                {
+                    var quotes = response.Data.Quotes;
+                    if (quotes is not null || quotes!.Count > 0)
+                    {
+                        MyQuotes = [.. quotes];
+                    }
+                }
+                if (response.Data!.PaginationResult is not null)
+                {
+                    PaginationResult = response.Data!.PaginationResult;
+                }
+
+
+            }
+        }
+        catch (Exception err)
+        {
+            Snackbar.Add(err.Message, Severity.Error);
+        }
+    }
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await this.LoadAuthUser();
+            await this.LoadOurQuotes(new QuotePaginationRequest { PageCount = 10, PageNumber = 1 });
+            StateHasChanged();
+        }
+    }
+}

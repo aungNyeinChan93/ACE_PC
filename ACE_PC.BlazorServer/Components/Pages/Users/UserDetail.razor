@@ -10,12 +10,13 @@
     else
     {
         <PageTitleComponent TitleModel="TitleModel"></PageTitleComponent>
-        <UserDetailCard2Component />
+
+        <UserDetailCard2Component  User="User"/>
     }
 </section>
 
 <pre>
-    @(JsonConvert.SerializeObject(User, Formatting.Indented))
+    @* @(JsonConvert.SerializeObject(User, Formatting.Indented)) *@
 </pre>
 
 @code {

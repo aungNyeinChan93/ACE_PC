@@ -136,7 +136,21 @@ namespace ACE_PC.BlazorServer.UseCases.Quotes
             return default!;
         }
 
+        //GetQuotesByAuthorId
+        public async Task<ResultModel<QuotesResponse>> GetQuotesByAuthorId(int id, QuotePaginationRequest? pagination = null)
+        {
+            var queryParams = new Dictionary<string, string?>
+            {
+                {"PageCount" , pagination?.PageCount.ToString() ?? "10" },
+                {"PageNumber" , pagination?.PageNumber.ToString() ?? "1" },
+            };
 
-        
+            var requestUri = QueryHelpers.AddQueryString($"/api/quotes/author/{id}", queryParams);
+            var response = await _httpClient.GetFromJsonAsync<ResultModel<QuotesResponse>>(requestUri);
+            return response!;
+        }
+
+
+
     }
 }

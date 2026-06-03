@@ -6,6 +6,7 @@ using ACE_PC.Domain.Interfaces.Quotes;
 using ACE_PC.Domain.Models.Quotes;
 using Azure.Core;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -141,7 +142,7 @@ namespace ACE_PC.BL.Services
                         UserName = l.User!.Name
                     }).ToList(),
                     Comments = q.Comments!
-                    .OrderByDescending(c => c.CommentId) 
+                    .OrderByDescending(c => c.CommentId)
                     .Select(c => new CommentDto
                     {
                         Id = c.CommentId,
@@ -278,7 +279,7 @@ namespace ACE_PC.BL.Services
             };
 
             responseModel = ResultModel<QuotesResponse>.Success(200, "Get All Quotes", data);
-        skip:
+            //skip:
             return responseModel;
         }
 
@@ -302,7 +303,7 @@ namespace ACE_PC.BL.Services
             updateQuote.CategoryId = request.CategoryId;
             //updateQuote.User = request.User;
             //updateQuote.Category = request.Category;
-                
+
 
             _context.Entry(updateQuote).State = EntityState.Modified;
             var result = await _context.SaveChangesAsync();
@@ -399,5 +400,79 @@ namespace ACE_PC.BL.Services
         }
 
 
+        public async Task<ResultModel<QuotesResponse>> GetByAuthorIdAsync(int id, QuotePaginationRequest? pagination = null)
+        {
+            var responseModel = new ResultModel<QuotesResponse>();
+
+            //pagination
+            var pageNumber = pagination?.PageNumber ?? 1;
+            var pageCount = pagination?.PageCount ?? 10;
+            var skip = (pageNumber - 1) * pageCount;
+            var itemCount = await _context.Quotes
+                            .Include(q => q.User)
+                            .Where(q => q.UserId == id)
+                            .CountAsync();
+
+            var quotes = await _context.Quotes.AsNoTracking()
+                .Include(q => q.Category)
+                .Include(q => q.User)
+                .Include(q => q.Comments)!.ThenInclude(c => c.User)
+                .Include(q => q.Likes)!.ThenInclude(l => l.User)
+                .Where(q => q.UserId == id)
+                .Select(q => new QuotesDto
+                {
+                    Id = q.QuoteId,
+                    Title = q.Title,
+                    Content = q.Content,
+                    Author = q.User!.Name,
+                    Category = q.Category!.Name,
+                    AuthorId = q.UserId,
+                    CategoryId = q.CategoryId,
+                    Likes = q.Likes!.Select(l => new LikeDto
+                    {
+                        UserId = l.UserId,
+                        UserName = l.User!.Name
+                    }).ToList(),
+                    Comments = q.Comments!
+                    .OrderByDescending(c => c.CommentId) // or c.CreatedOn
+                    .Select(c => new CommentDto
+                    {
+                        Id = c.CommentId,
+                        Content = c.Body,
+                        UserName = c.User!.Name
+                    }).ToList()
+                })
+                .Skip(skip)
+                .Take(pageCount)
+                .ToListAsync();
+
+
+            if (quotes is null)
+            {
+                responseModel = ResultModel<QuotesResponse>.ValidationError(400, "Quote Not Found!");
+                goto skip;
+            }
+
+            var totalPage = (int)Math.Ceiling(itemCount / (double)pageCount);
+
+            var paginationResult = new QuotesPaginationResult
+            {
+                ItemCount = itemCount,
+                PageCount = pageCount,
+                PageNumber = pageNumber,
+                TotalPage = totalPage
+            };
+
+            var data = new QuotesResponse
+            {
+                Quotes = quotes,
+                PaginationResult = paginationResult,
+            };
+
+            responseModel = ResultModel<QuotesResponse>.Success(200, "Get Quote", data);
+
+        skip:
+            return responseModel;
+        }
     }
 }

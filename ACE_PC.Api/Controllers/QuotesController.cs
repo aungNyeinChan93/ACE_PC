@@ -195,5 +195,29 @@ namespace ACE_PC.Api.Controllers
 
             return Ok(response);
         }
+
+        //GetByAuthorId
+        [HttpGet("author/{id:int}")]
+        public async Task<IActionResult> GetByAuthorId([FromRoute]int id, [FromQuery]QuotePaginationRequest pagination)
+        {
+            var response = await _quoteService.GetByAuthorIdAsync(id, pagination);
+            if (response.IsError)
+            {
+                if (response.ResponseType == EnumResponseType.Pending)
+                {
+                    return StatusCode(102, response);
+                }
+                if (response.ResponseType == EnumResponseType.ValidationError)
+                {
+                    return StatusCode(400, response);
+                }
+                if (response.ResponseType == EnumResponseType.SystemError)
+                {
+                    return StatusCode(500, response);
+                }
+            }
+
+            return Ok(response);
+        }
     }
 }

@@ -238,14 +238,25 @@ namespace ACE_PC.BL.Services
                     UserId = u.UserId,
                     Email = u.Email,
                     Role = u.Role,
-                    Quotes = u.Quotes,
+                    Quotes = u.Quotes!.Select(q=>new Quote
+                    {
+                        QuoteId = q.QuoteId,
+                        Category = q.Category,
+                        Comments = q.Comments,
+                        CategoryId = q.CategoryId,
+                        Content = q.Content,
+                        Likes = q.Likes,
+                        Title = q.Title,
+                        User = q.User,
+                        UserId = q.UserId
+                    }).OrderByDescending(q=>q.QuoteId).ToList(),
                     Password = u.Password,
                     Comments = u.Comments!.Select(c => new CommentDto
                     {
                         Id = c.CommentId,
                         Content = c.Body,
                         UserName = c.User!.Name
-                    }).ToList(),
+                    }).OrderByDescending(u=>u.Id).ToList(),
                     Likes = u.Likes!.ToList(),
                     LikeQuotes = u.Likes!.Select(l => new Quote
                     {

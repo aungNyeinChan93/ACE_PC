@@ -1,4 +1,5 @@
-﻿@page "/user-detail-demo"
+﻿
+
 
 <div class="container py-4">
 
@@ -18,7 +19,7 @@
                     <p class="text-muted mb-1">@User.Email</p>
 
                     <span class="badge bg-danger">
-                        @User.Role.Name
+                        @(User.Role?.Name ?? "Unknown")
                     </span>
                 </div>
 
@@ -33,8 +34,10 @@
         <div class="col-md-3">
             <div class="card border-0 shadow-sm">
                 <div class="card-body text-center">
-                    <h2 class="text-primary">@User.Quotes.Count</h2>
-                    <p class="mb-0">Quotes</p>
+                    <a href="/quotes/myQuotes" class="text-decoration-none">
+                        <h2 class="text-primary">@(User.Quotes?.Count ?? 0)</h2>
+                        <p class="mb-0">Quotes</p>
+                    </a>
                 </div>
             </div>
         </div>
@@ -42,8 +45,10 @@
         <div class="col-md-3">
             <div class="card border-0 shadow-sm">
                 <div class="card-body text-center">
-                    <h2 class="text-success">@User.Comments.Count</h2>
-                    <p class="mb-0">Comments</p>
+                    <a href="#" class="text-decoration-none">
+                        <h2 class="text-success">@(User.Comments?.Count ?? 0)</h2>
+                        <p class="mb-0">Comments</p>
+                    </a>
                 </div>
             </div>
         </div>
@@ -51,8 +56,10 @@
         <div class="col-md-3">
             <div class="card border-0 shadow-sm">
                 <div class="card-body text-center">
-                    <h2 class="text-danger">@User.Likes.Count</h2>
-                    <p class="mb-0">Likes</p>
+                    <a href="#" class="text-decoration-none">
+                        <h2 class="text-danger">@(User.Likes?.Count ?? 0)</h2>
+                        <p class="mb-0">Likes</p>
+                    </a>
                 </div>
             </div>
         </div>
@@ -60,7 +67,7 @@
         <div class="col-md-3">
             <div class="card border-0 shadow-sm">
                 <div class="card-body text-center">
-                    <h2 class="text-warning">@User.LikeQuotes.Count</h2>
+                    <h2 class="text-warning">@(User.LikeQuotes?.Count ?? 0)</h2>
                     <p class="mb-0">Liked Quotes</p>
                 </div>
             </div>
@@ -75,7 +82,7 @@
             <ul class="nav nav-tabs mb-3">
 
                 <li class="nav-item">
-                    <button class="nav-link @(ActiveTab == "quotes" ? "active" : "")"
+                    <button @ondblclick="OnDoubleClickQuote" class="nav-link @(ActiveTab == "quotes" ? "active" : "")"
                             @onclick='() => ActiveTab = "quotes"'>
                         Quotes
                     </button>
@@ -99,7 +106,7 @@
 
             @if (ActiveTab == "quotes")
             {
-                @foreach (var quote in User.Quotes)
+                @foreach (var quote in User.Quotes!.Take(10))
                 {
                     <div class="card bg-light mb-2 border-0">
                         <div class="card-body">
@@ -112,13 +119,13 @@
 
             @if (ActiveTab == "comments")
             {
-                @foreach (var comment in User.Comments)
+                @foreach (var comment in User.Comments!.Take(10))
                 {
                     <div class="card bg-light mb-2 border-0">
                         <div class="card-body">
                             <p class="mb-1">@comment.Content</p>
                             <small class="text-muted">
-                                Comment #@comment.CommentId
+                                Comment #@comment.Id
                             </small>
                         </div>
                     </div>
@@ -127,7 +134,7 @@
 
             @if (ActiveTab == "liked")
             {
-                @foreach (var quote in User.LikeQuotes)
+                @foreach (var quote in User.LikeQuotes!)
                 {
                     <div class="card bg-light mb-2 border-0">
                         <div class="card-body">
@@ -144,106 +151,113 @@
 </div>
 
 @code {
+    [Parameter]
+    public UserDto User { get; set; } = new();
 
     private string ActiveTab = "quotes";
 
-    private UserDetailViewModel User = new()
+    private async Task OnDoubleClickQuote()
     {
-        UserId = 2,
-        Name = "admin",
-        Email = "admin@123",
 
-        Role = new RoleViewModel
-        {
-            RoleId = 2,
-            Name = "admin"
-        },
-
-        Quotes =
-        [
-            new QuoteViewModel
-            {
-                QuoteId = 33,
-                Title = "Dolor dolorem ab rer",
-                Content = "Velit rerum beatae v"
-            },
-            new QuoteViewModel
-            {
-                QuoteId = 34,
-                Title = "Vitae iusto doloremq",
-                Content = "Nemo illo dolor opti"
-            }
-        ],
-
-        Comments =
-        [
-            new CommentViewModel
-            {
-                CommentId = 1,
-                Content = "This quote is very inspiring."
-            },
-            new CommentViewModel
-            {
-                CommentId = 2,
-                Content = "I completely agree with this idea."
-            },
-            new CommentViewModel
-            {
-                CommentId = 3,
-                Content = "Great perspective."
-            }
-        ],
-
-        Likes =
-        [
-            1, 2, 3, 4
-        ],
-
-        LikeQuotes =
-        [
-            new QuoteViewModel
-            {
-                QuoteId = 101,
-                Title = "Success is not final",
-                Content = "Failure is not fatal."
-            },
-            new QuoteViewModel
-            {
-                QuoteId = 102,
-                Title = "Code Every Day",
-                Content = "Consistency beats intensity."
-            }
-        ]
-    };
-
-    public class UserDetailViewModel
-    {
-        public int UserId { get; set; }
-        public string Name { get; set; } = "";
-        public string Email { get; set; } = "";
-        public RoleViewModel Role { get; set; } = new();
-        public List<QuoteViewModel> Quotes { get; set; } = [];
-        public List<CommentViewModel> Comments { get; set; } = [];
-        public List<int> Likes { get; set; } = [];
-        public List<QuoteViewModel> LikeQuotes { get; set; } = [];
     }
 
-    public class RoleViewModel
-    {
-        public int RoleId { get; set; }
-        public string Name { get; set; } = "";
-    }
+    // private UserDetailViewModel User = new()
+    // {
+    //     UserId = 2,
+    //     Name = "admin",
+    //     Email = "admin@123",
 
-    public class QuoteViewModel
-    {
-        public int QuoteId { get; set; }
-        public string Title { get; set; } = "";
-        public string Content { get; set; } = "";
-    }
+    //     Role = new RoleViewModel
+    //     {
+    //         RoleId = 2,
+    //         Name = "admin"
+    //     },
 
-    public class CommentViewModel
-    {
-        public int CommentId { get; set; }
-        public string Content { get; set; } = "";
-    }
+    //     Quotes =
+    //     [
+    //         new QuoteViewModel
+    //         {
+    //             QuoteId = 33,
+    //             Title = "Dolor dolorem ab rer",
+    //             Content = "Velit rerum beatae v"
+    //         },
+    //         new QuoteViewModel
+    //         {
+    //             QuoteId = 34,
+    //             Title = "Vitae iusto doloremq",
+    //             Content = "Nemo illo dolor opti"
+    //         }
+    //     ],
+
+    //     Comments =
+    //     [
+    //         new CommentViewModel
+    //         {
+    //             CommentId = 1,
+    //             Content = "This quote is very inspiring."
+    //         },
+    //         new CommentViewModel
+    //         {
+    //             CommentId = 2,
+    //             Content = "I completely agree with this idea."
+    //         },
+    //         new CommentViewModel
+    //         {
+    //             CommentId = 3,
+    //             Content = "Great perspective."
+    //         }
+    //     ],
+
+    //     Likes =
+    //     [
+    //         1, 2, 3, 4
+    //     ],
+
+    //     LikeQuotes =
+    //     [
+    //         new QuoteViewModel
+    //         {
+    //             QuoteId = 101,
+    //             Title = "Success is not final",
+    //             Content = "Failure is not fatal."
+    //         },
+    //         new QuoteViewModel
+    //         {
+    //             QuoteId = 102,
+    //             Title = "Code Every Day",
+    //             Content = "Consistency beats intensity."
+    //         }
+    //     ]
+    // };
+
+    // public class UserDetailViewModel
+    // {
+    //     public int UserId { get; set; }
+    //     public string Name { get; set; } = "";
+    //     public string Email { get; set; } = "";
+    //     public RoleViewModel Role { get; set; } = new();
+    //     public List<QuoteViewModel> Quotes { get; set; } = [];
+    //     public List<CommentViewModel> Comments { get; set; } = [];
+    //     public List<int> Likes { get; set; } = [];
+    //     public List<QuoteViewModel> LikeQuotes { get; set; } = [];
+    // }
+
+    // public class RoleViewModel
+    // {
+    //     public int RoleId { get; set; }
+    //     public string Name { get; set; } = "";
+    // }
+
+    // public class QuoteViewModel
+    // {
+    //     public int QuoteId { get; set; }
+    //     public string Title { get; set; } = "";
+    //     public string Content { get; set; } = "";
+    // }
+
+    // public class CommentViewModel
+    // {
+    //     public int CommentId { get; set; }
+    //     public string Content { get; set; } = "";
+    // }
 }
