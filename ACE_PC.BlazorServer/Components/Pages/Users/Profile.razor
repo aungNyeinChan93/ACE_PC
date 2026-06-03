@@ -2,43 +2,48 @@
 @using ACE_PC.BlazorServer.Components.Shared.User
 @using ACE_PC.Domain.Dtos.Users
 @inject UserUseCases UserUseCases;
-@* @attribute [Authorize] *@
+@attribute [Authorize]
 
 
+<section class="container mx-auto p-3">
+    <AuthorizeView>
+        <NotAuthorized>
+            <div class="d-flex justify-content-center align-items-center mt-xxl-5">
+                <Register2Component />
+            </div>
+        </NotAuthorized>
 
-<AuthorizeView>
+        <Authorized>
+            <div>
+                @if (AuthUser is null)
+                {
+                    <LoadingComponent />
+                }
+                else
+                {
+                    <!-- Title -->
+                    <PageTitleComponent TitleModel="TitleModel" />
 
-    <NotAuthorized>
-        <div class="d-flex justify-content-center align-items-center mt-xxl-5">
-            <Register2Component />
-        </div>
-    </NotAuthorized>
+                    <!-- AuthCard -->
+                    <ProfileCardComponent AuthUser="AuthUser" />
+                }
+            </div>
+        </Authorized>
+    </AuthorizeView>
+</section>
 
-    <Authorized>
-        <section>
-            @if (AuthUser is null)
-            {
-                <LoadingComponent />
-            }
-            else
-            {
-                <h3>Profile</h3>
-                <ProfileCardComponent AuthUser="AuthUser" />
-
-            }
-        </section>
-
-        <pre>
+@* <pre>
             @(JsonConvert.SerializeObject(AuthUser, Formatting.Indented))
-        </pre>
-
-    </Authorized>
-
-</AuthorizeView>
-
+        </pre> *@
 
 
 @code {
+    public BaseTitle TitleModel { get; set; } = new BaseTitle
+    {
+        Title = "User Profile",
+        Subtitle = "Your Credential!",
+        Icon = "bi bi-person"
+    };
 
     public UserDto? AuthUser { get; set; } = null!;
 

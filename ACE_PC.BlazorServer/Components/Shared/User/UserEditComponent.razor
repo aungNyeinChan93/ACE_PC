@@ -4,6 +4,7 @@
 @inject UserUseCases UserUseCases;
 @inject ISnackbar Snackbar;
 @inject NavigationManager NavigationManager;
+@inject AuthUseCase AuthUseCase;
 
 
 <EditForm Model="@UserDto" OnValidSubmit="EditUserAction">
@@ -96,7 +97,7 @@
                 </button> *@
 
                 
-                <a href="/users"
+                <a href="/"
                    class="btn btn-secondary">
                     <i class="bi bi-skip-backward-circle"></i>
                     Back
@@ -191,7 +192,8 @@
             if (response.IsSuccess)
             {
                 Snackbar.Add(response.ResponseMessage);
-                NavigationManager.NavigateTo("/users");
+                await AuthUseCase.Logout();
+                NavigationManager.NavigateTo("/login");
                 StateHasChanged();
             }
         }

@@ -1,6 +1,5 @@
 ﻿@using ACE_PC.Domain.Dtos.Users
-
-@(JsonConvert.SerializeObject(AuthUser, Formatting.Indented))
+@inject NavigationManager NavigationManager;
 
 
 <div class="container mt-5">
@@ -12,7 +11,7 @@
                 <!-- Profile Header -->
                 <div class="bg-dark p-4 text-center text-white">
 
-                    <img src="@User.ProfileImage"
+                    <img src="@Assets[$"/images/profiles/p1.png"]"
                          class="rounded-circle border border-4 border-white shadow"
                          width="120"
                          height="120" />
@@ -47,22 +46,25 @@
                     <div class="row mt-4 text-center">
 
                         <div class="col-4">
-                            <div class="rounded-3 border p-3 shadow-sm">
-                                <h4>@User.Quotes.Count</h4>
-                                <small class="text-muted">Quotes</small>
-                            </div>
+                            <a href="/quotes/myQuotes" class="text-decoration-none">
+
+                                <div class="rounded-3 border p-3 shadow-sm">
+                                    <h4>@AuthUser?.Quotes!.Count</h4>
+                                    <small class="text-muted">Quotes</small>
+                                </div>
+                            </a>
                         </div>
 
                         <div class="col-4">
                             <div class="rounded-3 border p-3 shadow-sm">
-                                <h4>@User.Comments.Count</h4>
+                                <h4>@AuthUser?.Comments!.Count</h4>
                                 <small class="text-muted">Comments</small>
                             </div>
                         </div>
 
                         <div class="col-4">
                             <div class="rounded-3 border p-3 shadow-sm">
-                                <h4>@User.Likes.Count</h4>
+                                <h4>@AuthUser?.Likes!.Count</h4>
                                 <small class="text-muted">Likes</small>
                             </div>
                         </div>
@@ -74,13 +76,17 @@
                 <!-- Footer -->
                 <div class="card-footer border-0 bg-white pb-4 text-center">
 
-                    <button class="btn btn-dark rounded-pill px-4">
+                    <button @onclick="EditUserAction" class="btn btn-dark rounded-pill px-4">
                         Edit Profile
                     </button>
 
-                    <button class="btn btn-outline-danger rounded-pill ms-2 px-4">
-                        Logout
-                    </button>
+                    <AuthorizeView>
+                        <Authorized>
+                            <button @onclick="LogoutAction" class="btn btn-outline-danger rounded-pill ms-2 px-4">
+                                Logout
+                            </button>
+                        </Authorized>
+                    </AuthorizeView>
 
                 </div>
 
@@ -94,69 +100,79 @@
     [Parameter]
     public UserDto? AuthUser { get; set; }
 
-    public UserProfile User = new()
+    private async Task EditUserAction()
     {
-        UserId = 1,
-        Name = "Aung Nyein Chan",
-        Email = "aungnyeinchan@gmail.com",
-        Password = "123456",
-        ProfileImage = "https://i.pravatar.cc/300?img=12",
-
-        Role = new Role
-        {
-            RoleId = 1,
-            Name = "Admin"
-        },
-
-        Quotes = new List<string>
-        {
-            "Stay hard.",
-            "Never give up.",
-            "Code everyday."
-        },
-
-        Comments = new List<string>
-        {
-            "Great post!",
-            "Awesome UI!",
-            "Very helpful."
-        },
-
-        Likes = new List<string>
-        {
-            "Post 1",
-            "Post 2",
-            "Post 3",
-            "Post 4",
-            "Post 5"
-        }
-    };
-
-    public class UserProfile
-    {
-        public int UserId { get; set; }
-
-        public string Name { get; set; } = string.Empty;
-
-        public string Password { get; set; } = string.Empty;
-
-        public string Email { get; set; } = string.Empty;
-
-        public string ProfileImage { get; set; } = string.Empty;
-
-        public Role Role { get; set; } = new();
-
-        public List<string> Quotes { get; set; } = new();
-
-        public List<string> Comments { get; set; } = new();
-
-        public List<string> Likes { get; set; } = new();
+        NavigationManager.NavigateTo($"/users/edit/{AuthUser!.UserId}");
     }
 
-    public class Role
+    private async Task LogoutAction()
     {
-        public int RoleId { get; set; }
-
-        public string Name { get; set; } = string.Empty;
+        NavigationManager.NavigateTo("/logout");
     }
+
+    // public UserProfile User = new()
+    // {
+    //     UserId = 1,
+    //     Name = "Aung Nyein Chan",
+    //     Email = "aungnyeinchan@gmail.com",
+    //     Password = "123456",
+    //     ProfileImage = "https:i.pravatar.cc/300?img=12",
+
+    //     Role = new Role
+    //     {
+    //         RoleId = 1,
+    //         Name = "Admin"
+    //     },
+
+    //     Quotes = new List<string>
+    //     {
+    //         "Stay hard.",
+    //         "Never give up.",
+    //         "Code everyday."
+    //     },
+
+    //     Comments = new List<string>
+    //     {
+    //         "Great post!",
+    //         "Awesome UI!",
+    //         "Very helpful."
+    //     },
+
+    //     Likes = new List<string>
+    //     {
+    //         "Post 1",
+    //         "Post 2",
+    //         "Post 3",
+    //         "Post 4",
+    //         "Post 5"
+    //     }
+    // };
+
+    // public class UserProfile
+    // {
+    //     public int UserId { get; set; }
+
+    //     public string Name { get; set; } = string.Empty;
+
+    //     public string Password { get; set; } = string.Empty;
+
+    //     public string Email { get; set; } = string.Empty;
+
+    //     public string ProfileImage { get; set; } = string.Empty;
+
+    //     public Role Role { get; set; } = new();
+
+    //     public List<string> Quotes { get; set; } = new();
+
+    //     public List<string> Comments { get; set; } = new();
+
+    //     public List<string> Likes { get; set; } = new();
+    // }
+
+    // public class Role
+    // {
+    //     public int RoleId { get; set; }
+
+    //     public string Name { get; set; } = string.Empty;
+    // }
 }
