@@ -4,6 +4,7 @@
 @attribute [Authorize(Roles = "user,admin")]
 @inject QuoteUseCases QuoteUseCases;
 @inject ISnackbar Snackbar;
+@inject NavigationManager NavigationManager;
 
 
 @if (QuoteDtos is null)
@@ -16,13 +17,24 @@ else
 
         <div class="container">
 
-            <!-- Header -->
+            <!-- Title -->
+            <PageTitleComponent TitleModel="TitleModel">
+                <Actions>
+                    <button @onclick="CreateQuote" class="btn btn-primary">
+                        <i class="bi bi-plus-lg"></i>
+                        Create Quote
+                    </button>
+                </Actions>
+            </PageTitleComponent>
+
+
+            @* <!-- Header -->
             <div class="mb-5 text-center">
                 <h1 class="fw-bold">Quotes Collection</h1>
                 <p class="text-muted">
                     Discover inspiring quotes from our community.
                 </p>
-            </div>
+            </div> *@
 
             <!-- Quote Lists -->
             <div class="row g-4">
@@ -37,6 +49,11 @@ else
                     </div>
                 }
             </div>
+
+            <!-- Pagination -->
+            <QuotespaginationComponent LoadQuotes="LoadQuotes" PaginationResult="PaginationResult" />
+
+
         </div>
 
     </section>
@@ -45,18 +62,34 @@ else
 
 <pre class="overflow-hidden">
     @* @(JsonConvert.SerializeObject(QuoteDtos,Formatting.Indented)) *@
+     @* @(JsonConvert.SerializeObject(PaginationResult, Formatting.Indented))  *@
 </pre>
 
 
 @code {
 
+    public BaseTitle TitleModel { get; set; } = new BaseTitle
+    {
+        Title = "Quote Collection",
+        Subtitle = "Discover inspiring quotes from our community.",
+        Icon = "bi bi-chat-left-quote"
+    };
+
     public List<QuotesDto>? QuoteDtos { get; set; }
 
-    private async Task LoadQuotes()
+    public QuotesPaginationResult PaginationResult { get; set; } = new();
+
+    public QuotePaginationRequest PaginationRequest { get; set; } = new QuotePaginationRequest
+    {
+        PageCount = 9,
+        PageNumber = 1,
+    };
+
+    private async Task LoadQuotes(QuotePaginationRequest pagination)
     {
         try
         {
-            var response = await QuoteUseCases.GetAllQuotes();
+            var response = await QuoteUseCases.GetAllQuotes(pagination);
             if (response.IsError)
             {
                 if (response.ResponseType == Domain.Helpers.ReqResHelper.EnumResponseType.Pending)
@@ -83,6 +116,11 @@ else
                 {
                     QuoteDtos = [.. quotes];
                 }
+                if (response.Data.PaginationResult is not null)
+                {
+                    var paginationResult = response.Data.PaginationResult;
+                    PaginationResult = paginationResult!;
+                }
 
             }
         }
@@ -98,9 +136,14 @@ else
         if (firstRender)
         {
             await Task.Delay(150);
-            await this.LoadQuotes();
+            await this.LoadQuotes(PaginationRequest);
             StateHasChanged();
         }
+    }
+
+    private async Task CreateQuote()
+    {
+        NavigationManager.NavigateTo("/quotes/create");
     }
 
 }

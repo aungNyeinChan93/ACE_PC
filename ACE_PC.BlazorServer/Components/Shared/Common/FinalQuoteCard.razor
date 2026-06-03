@@ -1,4 +1,4 @@
-﻿
+﻿@inject NavigationManager NavigationManager;
 
 <div class="card quote-card border-0 shadow">
 
@@ -54,6 +54,18 @@
                     <small class="text-muted">
                         Quote #@QuoteDto.Id
                     </small>
+
+                    
+                    <small class="quote-date">
+                        <i class="bi bi-clock-history me-1"></i>
+                        @QuoteDto.CreatedAt.ToString("dd MMM yyyy • hh:mm tt")
+                    </small>
+
+                    @* <span class="date-badge">
+                        <i class="bi bi-calendar-event me-1"></i>
+                        @QuoteDto.CreatedAt.ToString("dd MMM yyyy")
+                    </span> *@
+
                 </div>
 
             </div>
@@ -75,7 +87,7 @@
                  Detail
             </button>  *@
 
-            <button class="action-btn detail-btn flex-fill">
+            <button @onclick="@(() => ViewDetailAction(QuoteDto.Id))" class="action-btn detail-btn flex-fill">
                 <i class="bi bi-arrow-right-circle-fill me-2"></i>
                 View Detail
             </button>
@@ -87,35 +99,14 @@
 </div>
 
 
-@code {
+            @code {
 
     [Parameter]
     public QuotesDto QuoteDto { get; set; } = new();
 
-    private Quote MyQuote = new()
+    private async Task ViewDetailAction(int id)
     {
-        Id = 12,
-        Title = "Sit minus dolores c",
-        Content = "Eveniet quas enim q",
-        Author = "admin",
-        AuthorId = 0,
-        Category = "22",
-        CategoryId = 0,
-        Likes = new() { "User1", "User2", "User3" },
-        Comments = new() { "Great quote!", "Nice one!" }
-    };
-
-    public class Quote
-    {
-        public int Id { get; set; }
-        public string Title { get; set; } = "";
-        public string Content { get; set; } = "";
-        public string Author { get; set; } = "";
-        public int AuthorId { get; set; }
-        public string Category { get; set; } = "";
-        public int CategoryId { get; set; }
-        public List<string> Likes { get; set; } = new();
-        public List<string> Comments { get; set; } = new();
+        NavigationManager.NavigateTo($"quotes/detail/{id}");
     }
 }
 
@@ -228,4 +219,22 @@
             transform: scale(1.03);
             opacity: .9;
         }
+
+    .quote-date {
+        color: #6c757d;
+        font-size: 0.8rem;
+        display: block;
+        margin-top: 2px;
+    }
+
+    .date-badge {
+        display: inline-block;
+        margin-top: 4px;
+        padding: 4px 10px;
+        border-radius: 50px;
+        background: rgba(13,110,253,.08);
+        color: #0d6efd;
+        font-size: .75rem;
+        font-weight: 600;
+    }
 </style>

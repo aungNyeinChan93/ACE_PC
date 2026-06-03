@@ -1,4 +1,6 @@
 ﻿@inject CommentUseCases CommentUseCases;
+@inject UserUseCases UserUseCases;
+@inject ISnackbar Snackbar;
 
 
 <!-- Create Comment Box -->
@@ -63,7 +65,24 @@
 
     public CommentDto Comment { get; set; } = new();
 
+    public UserDto AuthUser { get; set; } = new();
+
     private bool IsPosting = false;
+
+    private async Task LoadAuthUser()
+    {
+        try
+        {
+            var authUser = await UserUseCases.GetAuthUser();
+            AuthUser = authUser ?? new();
+
+        }
+        catch (Exception err)
+        {
+            Snackbar.Add(err.Message,Severity.Error);
+        }
+
+    }
 
 
     private async Task AddComment()
@@ -82,7 +101,7 @@
         {
             Body = Comment.Content,
             QuoteId = Quote.Id,
-            UserId = Quote.AuthorId
+            UserId = AuthUser.UserId
         };
 
         var response = await CommentUseCases.CreateAsync(request);
@@ -98,5 +117,13 @@
         IsPosting = false;
     }
 
- 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await this.LoadAuthUser();
+            StateHasChanged();
+        }
+    }
+
 }

@@ -1,4 +1,4 @@
-﻿@page "/quotes/myQuotes"
+﻿@page "/quotes/myQuotes/{userId:int}"
 @inject QuoteUseCases QuoteUseCases;
 @inject UserUseCases UserUseCases;
 @inject ISnackbar Snackbar;
@@ -37,6 +37,8 @@
     
 
 @code {
+    [Parameter]
+    public int UserId { get; set; }
 
     public BaseTitle TitleModel { get; set; } = new BaseTitle
     {
@@ -75,7 +77,7 @@
     {
         try
         {
-            var response = await QuoteUseCases.GetQuotesByAuthorId(AuthUser.UserId, pagination);
+            var response = await QuoteUseCases.GetQuotesByAuthorId(UserId, pagination);
             if (response.IsError)
             {
                 if (response.ResponseType == Domain.Helpers.ReqResHelper.EnumResponseType.Pending)
@@ -123,7 +125,7 @@
     {
         if (firstRender)
         {
-            await this.LoadAuthUser();
+            // await this.LoadAuthUser();
             await this.LoadOurQuotes(new QuotePaginationRequest { PageCount = 10, PageNumber = 1 });
             StateHasChanged();
         }

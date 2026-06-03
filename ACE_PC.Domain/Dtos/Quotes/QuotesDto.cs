@@ -18,6 +18,8 @@ namespace ACE_PC.Domain.Dtos.Quotes
         public int CategoryId { get; set; }
         public List<LikeDto> Likes { get; set; } = new();
         public List<CommentDto> Comments { get; set; } = new();
+
+        public DateTime CreatedAt { get; set; }
     }
 
     public class LikeDto

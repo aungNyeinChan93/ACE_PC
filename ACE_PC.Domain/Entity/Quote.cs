@@ -27,7 +27,7 @@ namespace ACE_PC.Domain.Entity
 
         public List<Comment>? Comments { get; set; }
 
-        public DateTime? CreatedAt { get; set; } = DateTime.Now;
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
 
 
     }

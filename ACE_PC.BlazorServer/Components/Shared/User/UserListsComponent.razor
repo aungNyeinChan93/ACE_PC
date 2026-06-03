@@ -24,7 +24,7 @@
 
                         <TemplateColumn Title="Role">
                             <CellTemplate Context="user">
-                                <MudChip Color="Color.Primary" Size="Size.Small">
+                                <MudChip  Color="@(user.Item.Role?.Name == "user"? Color.Success :Color.Primary)" Size="Size.Small">
                                     @user.Item.Role?.Name
                                 </MudChip>
                             </CellTemplate>

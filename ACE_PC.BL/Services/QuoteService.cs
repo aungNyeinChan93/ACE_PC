@@ -67,20 +67,23 @@ namespace ACE_PC.BL.Services
                     Content = q.Content,
                     Author = q.User!.Name,
                     Category = q.Category!.Name,
+                    CreatedAt = q.CreatedAt,
                     Likes = q.Likes!.Select(l => new LikeDto
                     {
                         UserId = l.UserId,
                         UserName = l.User!.Name
                     }).ToList(),
                     Comments = q.Comments!
-                    .OrderByDescending(c => c.CommentId) // or c.CreatedOn
                     .Select(c => new CommentDto
                     {
                         Id = c.CommentId,
                         Content = c.Body,
                         UserName = c.User!.Name
-                    }).ToList()
+                    })
+                    .OrderByDescending(c => c.Id) // or c.CreatedOn
+                    .ToList()
                 })
+                .OrderByDescending(q=>q.CreatedAt)
                 .ToListAsync();
 
 
@@ -136,6 +139,7 @@ namespace ACE_PC.BL.Services
                     Title = q.Title,
                     Author = q.User!.Name,
                     Category = q.Category!.Name,
+                    CreatedAt = q.CreatedAt,
                     Likes = q.Likes!.Select(l => new LikeDto
                     {
                         UserId = l.UserId,
@@ -150,6 +154,7 @@ namespace ACE_PC.BL.Services
                         UserName = c.User!.Name
                     }).ToList()
                 })
+                .OrderByDescending(q => q.CreatedAt)
                 .ToListAsync();
 
 
@@ -250,6 +255,7 @@ namespace ACE_PC.BL.Services
                     Content = q.Content,
                     Author = q.User!.Name,
                     Category = q.Category!.Name,
+                    CreatedAt = q.CreatedAt,
                     Likes = q.Likes!.Select(l => new LikeDto
                     {
                         UserId = l.UserId,
@@ -264,6 +270,7 @@ namespace ACE_PC.BL.Services
                         UserName = c.User!.Name
                     }).ToList()
                 })
+                .OrderByDescending(q=>q.CreatedAt)
                 .ToListAsync();
 
             //if (quotes is null || quotes.Count <= 0)
@@ -364,6 +371,7 @@ namespace ACE_PC.BL.Services
                     Category = q.Category!.Name,
                     AuthorId = q.UserId,
                     CategoryId = q.CategoryId,
+                    CreatedAt = q.CreatedAt,
                     Likes = q.Likes!.Select(l => new LikeDto
                     {
                         UserId = l.UserId,
@@ -399,7 +407,7 @@ namespace ACE_PC.BL.Services
 
         }
 
-
+        //GetByAuthorIdAsync
         public async Task<ResultModel<QuotesResponse>> GetByAuthorIdAsync(int id, QuotePaginationRequest? pagination = null)
         {
             var responseModel = new ResultModel<QuotesResponse>();
@@ -428,6 +436,7 @@ namespace ACE_PC.BL.Services
                     Category = q.Category!.Name,
                     AuthorId = q.UserId,
                     CategoryId = q.CategoryId,
+                    CreatedAt = q.CreatedAt,
                     Likes = q.Likes!.Select(l => new LikeDto
                     {
                         UserId = l.UserId,
@@ -444,6 +453,7 @@ namespace ACE_PC.BL.Services
                 })
                 .Skip(skip)
                 .Take(pageCount)
+                .OrderByDescending(q=>q.CreatedAt)
                 .ToListAsync();
 
 
