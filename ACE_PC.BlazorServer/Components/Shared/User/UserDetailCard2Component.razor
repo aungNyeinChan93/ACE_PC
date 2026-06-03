@@ -34,7 +34,7 @@
         <div class="col-md-3">
             <div class="card border-0 shadow-sm">
                 <div class="card-body text-center">
-                    <a href="/quotes/myQuotes" class="text-decoration-none">
+                    <a href="/quotes/myQuotes/@UserId" class="text-decoration-none">
                         <h2 class="text-primary">@(User.Quotes?.Count ?? 0)</h2>
                         <p class="mb-0">Quotes</p>
                     </a>
@@ -153,6 +153,9 @@
 @code {
     [Parameter]
     public UserDto User { get; set; } = new();
+
+    [Parameter]
+    public int UserId { get; set; }
 
     private string ActiveTab = "quotes";
 
