@@ -1,40 +1,47 @@
 ﻿@page "/quotes"
+@using ACE_PC.BlazorServer.Components.Temps
 
 @attribute [Authorize(Roles = "user,admin")]
 @inject QuoteUseCases QuoteUseCases;
 @inject ISnackbar Snackbar;
 
 
-<section class="bg-light min-vh-100 py-5">
+@if (QuoteDtos is null)
+{
+    <LoadingComponent />
+}
+else
+{
+    <section class="bg-light min-vh-100 py-5">
 
-    <div class="container">
+        <div class="container">
 
-        <!-- Header -->
-        <div class="mb-5 text-center">
-            <h1 class="fw-bold">Quotes Collection</h1>
-            <p class="text-muted">
-                Discover inspiring quotes from our community.
-            </p>
-        </div>
+            <!-- Header -->
+            <div class="mb-5 text-center">
+                <h1 class="fw-bold">Quotes Collection</h1>
+                <p class="text-muted">
+                    Discover inspiring quotes from our community.
+                </p>
+            </div>
 
-        <!-- Quotes Grid -->
-        <div class="row g-4">
+            <!-- Quote Lists -->
+            <div class="row g-4">
+                @foreach (var quote in QuoteDtos)
+                {
+                    <div class="col-12 col-md-6 col-xl-4">
+                        <div class="h-100">
 
-            @for (int i = 0; i < 6; i++)
-            {
-                <div class="col-12 col-md-6 col-xl-4">
-                    <div class="h-100">
-                        @* <QuoteCardComponent /> *@
-                        <QuoteCard2Component />
+                            <!-- Quote Card -->
+                            <FinalQuoteCard QuoteDto="quote" />
+                        </div>
                     </div>
-                </div>
-            }
-
+                }
+            </div>
         </div>
 
-    </div>
+    </section>
+}
 
-</section>
 
 <pre class="overflow-hidden">
     @* @(JsonConvert.SerializeObject(QuoteDtos,Formatting.Indented)) *@
@@ -90,6 +97,7 @@
     {
         if (firstRender)
         {
+            await Task.Delay(150);
             await this.LoadQuotes();
             StateHasChanged();
         }

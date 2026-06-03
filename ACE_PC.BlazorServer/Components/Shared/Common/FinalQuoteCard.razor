@@ -1,0 +1,231 @@
+﻿
+
+<div class="card quote-card border-0 shadow">
+
+    <div class="quote-header"></div>
+
+    <div class="card-body p-4">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+
+            <span class="badge category-badge px-3 py-2">
+                🚀 @QuoteDto.Category
+            </span>
+
+            <button class="menu-btn">
+                <i class="bi bi-three-dots"></i>
+            </button>
+
+        </div>
+
+        <div class="quote-icon mb-4">
+            <i class="bi bi-chat-quote-fill"></i>
+        </div>
+
+        <h4 class="fw-bold quote-title">
+            @QuoteDto.Title
+        </h4>
+
+        <p class="quote-content">
+            @* @QuoteDto.Content.ToString().Substring(0,10) *@
+            @(QuoteDto.Content.Length > 50
+                ? QuoteDto.Content.Substring(0, 50) + "..."
+                : QuoteDto.Content)
+
+        </p>
+
+    </div>
+
+    <div class="card-footer border-0 bg-white p-4">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+
+            <div class="d-flex align-items-center gap-3">
+
+                <div class="author-avatar">
+                    @QuoteDto.Author[0].ToString().ToUpper()
+                </div>
+
+                <div>
+                    <div class="fw-bold">
+                        @QuoteDto.Author
+                    </div>
+
+                    <small class="text-muted">
+                        Quote #@QuoteDto.Id
+                    </small>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="d-flex gap-2">
+
+            <button class="action-btn like-btn flex-fill">
+                ❤️ @QuoteDto.Likes.Count
+            </button>
+
+            <button class="action-btn comment-btn flex-fill">
+                💬 @QuoteDto.Comments.Count
+            </button>
+
+            @* <button class="action-btn detail-btn flex-fill">
+                <i class="bi bi-eye-fill me-1"></i>
+                 Detail
+            </button>  *@
+
+            <button class="action-btn detail-btn flex-fill">
+                <i class="bi bi-arrow-right-circle-fill me-2"></i>
+                View Detail
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@code {
+
+    [Parameter]
+    public QuotesDto QuoteDto { get; set; } = new();
+
+    private Quote MyQuote = new()
+    {
+        Id = 12,
+        Title = "Sit minus dolores c",
+        Content = "Eveniet quas enim q",
+        Author = "admin",
+        AuthorId = 0,
+        Category = "22",
+        CategoryId = 0,
+        Likes = new() { "User1", "User2", "User3" },
+        Comments = new() { "Great quote!", "Nice one!" }
+    };
+
+    public class Quote
+    {
+        public int Id { get; set; }
+        public string Title { get; set; } = "";
+        public string Content { get; set; } = "";
+        public string Author { get; set; } = "";
+        public int AuthorId { get; set; }
+        public string Category { get; set; } = "";
+        public int CategoryId { get; set; }
+        public List<string> Likes { get; set; } = new();
+        public List<string> Comments { get; set; } = new();
+    }
+}
+
+<style>
+    .quote-card {
+        border-radius: 24px;
+        overflow: hidden;
+        transition: all .3s ease;
+        background: #fff;
+        position: relative;
+    }
+
+        .quote-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0,0,0,.15) !important;
+        }
+
+    .quote-header {
+        height: 8px;
+        background: linear-gradient( 90deg, #ff6b6b, #feca57, #48dbfb, #5f27cd );
+    }
+
+    .category-badge {
+        background: linear-gradient( 135deg, #667eea, #764ba2 );
+        color: white;
+        border: none;
+        font-weight: 600;
+    }
+
+    .quote-icon {
+        width: 70px;
+        height: 70px;
+        border-radius: 20px;
+        background: linear-gradient( 135deg, #4facfe, #00f2fe );
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+    }
+
+    .author-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: linear-gradient( 135deg, #fa709a, #fee140 );
+        color: white;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .action-btn {
+        border: none;
+        border-radius: 12px;
+        padding: .55rem 1rem;
+        font-weight: 600;
+        transition: .25s;
+    }
+
+    .like-btn {
+        background: rgba(255, 99, 132, .1);
+        color: #e91e63;
+    }
+
+        .like-btn:hover {
+            background: #e91e63;
+            color: white;
+        }
+
+    .comment-btn {
+        background: rgba(54, 162, 235, .1);
+        color: #0d6efd;
+    }
+
+        .comment-btn:hover {
+            background: #0d6efd;
+            color: white;
+        }
+
+    .menu-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        border: none;
+        background: #f8f9fa;
+    }
+
+        .menu-btn:hover {
+            background: #e9ecef;
+        }
+
+    .quote-title {
+        color: #212529;
+    }
+
+    .quote-content {
+        color: #6c757d;
+        line-height: 1.8;
+    }
+
+    .detail-btn {
+        background: linear-gradient( 135deg, #20c997, #0d6efd );
+        color: white;
+        border: none;
+    }
+
+        .detail-btn:hover {
+            transform: scale(1.03);
+            opacity: .9;
+        }
+</style>
