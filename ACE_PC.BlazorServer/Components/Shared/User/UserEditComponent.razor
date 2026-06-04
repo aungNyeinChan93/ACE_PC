@@ -61,25 +61,28 @@
 
 
                 <!-- Role -->
-                <div class="col-md-6">
-                    <label class="form-label">Role</label>
+                @if (UserDto.Role!.RoleId == 2)
+                {
+                    <div class="col-md-6">
+                        <label class="form-label">Role</label>
 
-                    <InputSelect class="form-select"
-                                 @bind-Value="UserDto.Role!.RoleId">
+                        <InputSelect class="form-select"
+                                     @bind-Value="UserDto.Role!.RoleId">
 
-                        <option value="0">Select Role</option>
+                            <option value="0">Select Role</option>
 
-                        @foreach (var role in Roles)
-                        {
-                            <option value="@role.RoleId">
-                                @role.Name
-                            </option>
-                        }
+                            @foreach (var role in Roles)
+                            {
+                                <option value="@role.RoleId">
+                                    @role.Name
+                                </option>
+                            }
 
-                    </InputSelect>
+                        </InputSelect>
 
-                    <ValidationMessage For="@(() => UserDto.Role.RoleId)" />
-                </div>
+                        <ValidationMessage For="@(() => UserDto.Role.RoleId)" />
+                    </div>
+                }
 
             </div>
 

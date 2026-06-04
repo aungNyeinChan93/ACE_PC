@@ -1,24 +1,33 @@
 ﻿@using ACE_PC.BlazorServer.Components.Shared.Quotes
 
 
-<div class="container py-5">
-    <div class="row justify-content-center">
+@if (Quote is null)
+{
+    <LoadingComponent />
+}
+else
+{
 
-        <!-- Quote Card Section -->
-        <QuoteDetailCardComponent LoadQuote="LoadQuote" AuthUser="AuthUser" Quote="Quote" OnComment="HandleIsComment" />
+    <div class="container py-5">
+        <div class="row justify-content-center">
 
-        <!-- Comment Box Section-->
-        @if (IsComment)
-        {
-            <div class="p-4">
-                <QuoteCommetCreate Quote="Quote" LoadQuote="LoadQuote" />
-            </div>
-        }
+            <!-- Quote Card Section -->
+            <QuoteDetailCardComponent LoadQuote="LoadQuote" AuthUser="AuthUser" Quote="Quote" OnComment="HandleIsComment" />
 
-        <!-- Comment Show Section-->
-        <QuoteCommentCard Comments="Quote.Comments" />
+            <!-- Comment Box Section-->
+            @if (IsComment)
+            {
+                <div class="p-4">
+                    <QuoteCommetCreate Quote="Quote" LoadQuote="LoadQuote" />
+                </div>
+            }
+
+            <!-- Comment Show Section-->
+            <QuoteCommentCard Comments="Quote.Comments" />
+        </div>
     </div>
-</div>
+}
+
 
 <pre>
     @* @(JsonConvert.SerializeObject(Quote,Formatting.Indented)) *@
@@ -26,7 +35,7 @@
 
 @code {
     [Parameter]
-    public UserDto AuthUser { get; set; } = new();
+    public UserDto? AuthUser { get; set; }
 
     [Parameter]
     public QuotesDto Quote { get; set; } = new();

@@ -13,14 +13,13 @@ else
     <LoadingComponent />
 }
 
-<pre>
-</pre>
+
 
 @code {
     [Parameter]
     public int QuoteId { get; set; }
 
-    public QuotesDto Quote { get; set; } = new();
+    public QuotesDto? Quote { get; set; }
 
     public UserDto AuthUser { get; set; } = new();
 
