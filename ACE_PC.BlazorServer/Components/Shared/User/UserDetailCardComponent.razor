@@ -86,7 +86,7 @@
                         {
                             <div class="list-group-item">
 
-                                <h6 class="fw-bold">
+                                <h6 class="fw-bold">    
                                     @quote.Title
                                 </h6>
 
@@ -95,7 +95,7 @@
                                 </p>
 
                                 <span class="badge bg-secondary">
-                                    Quote ID: @quote.QuoteId
+                                    Quote ID: @quote.Id
                                 </span>
 
                                 <span class="badge bg-info ms-2">
@@ -139,21 +139,21 @@
         },
         Quotes =
     [
-        new Quote
+        new QuotesDto
         {
-            QuoteId = 33,
+            Id = 33,
             Title = "Dolor dolorem ab rer",
             Content = "Velit rerum beatae v"
         },
-        new Quote
+        new QuotesDto
         {
-            QuoteId = 34,
+            Id = 34,
             Title = "Vitae iusto doloremq",
             Content = "Nemo illo dolor opti"
         },
-        new Quote
+        new QuotesDto
         {
-            QuoteId = 35,
+            Id = 35,
             Title = "Nulla minim nesciunt",
             Content = "Officia tempore omn"
         }

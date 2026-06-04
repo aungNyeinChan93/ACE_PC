@@ -1,4 +1,6 @@
-﻿<div class="col-lg-12">
+﻿@inject LikesUseCase LikesUseCase;
+
+<div class="col-lg-12">
     <div class="card rounded-4 overflow-hidden border-0 shadow-lg">
 
         <!-- Optional Cover Image -->
@@ -103,7 +105,7 @@
 
                     <!-- Like -->
                     <div class="col">
-                        <button class="btn btn-light w-100 rounded-3 py-2">
+                        <button @onclick="LikeToogleAction" class="btn btn-light w-100 rounded-3 py-2">
                             <i class="bi bi-heart text-danger me-2"></i>
                             Like
                         </button>
@@ -154,4 +156,11 @@
     public EventCallback<bool> OnComment { get; set; }
 
     public bool IsComment { get; set; } = false;
+
+    
+
+    private async Task LikeToogleAction()
+    {
+        // var response = await LikesUseCase.LikeToogle();
+    }
 }

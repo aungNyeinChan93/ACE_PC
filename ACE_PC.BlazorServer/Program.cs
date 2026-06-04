@@ -5,6 +5,7 @@ using ACE_PC.BlazorServer.Services;
 using ACE_PC.BlazorServer.UseCases.Auth;
 using ACE_PC.BlazorServer.UseCases.Categories;
 using ACE_PC.BlazorServer.UseCases.Comments;
+using ACE_PC.BlazorServer.UseCases.Like;
 using ACE_PC.BlazorServer.UseCases.Quotes;
 using ACE_PC.BlazorServer.UseCases.Users;
 using Blazored.Toast;
@@ -59,6 +60,7 @@ builder.Services.AddScoped<UserUseCases>();
 builder.Services.AddScoped<QuoteUseCases>();
 builder.Services.AddScoped<CommentUseCases>();
 builder.Services.AddScoped<CommonUserInterfaceService>();
+builder.Services.AddScoped<LikesUseCase>();
 
 
 

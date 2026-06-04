@@ -46,10 +46,10 @@
                     <div class="row mt-4 text-center">
 
                         <div class="col-4">
-                            <a href="/quotes/myQuotes" class="text-decoration-none">
+                            <a href="/quotes/myQuotes/@AuthUser?.UserId" class="text-decoration-none">
 
                                 <div class="rounded-3 border p-3 shadow-sm">
-                                    <h4>@AuthUser?.Quotes!.Count</h4>
+                                    <h4>@(AuthUser?.Quotes!.Count)</h4>
                                     <small class="text-muted">Quotes</small>
                                 </div>
                             </a>
@@ -110,69 +110,5 @@
         NavigationManager.NavigateTo("/logout");
     }
 
-    // public UserProfile User = new()
-    // {
-    //     UserId = 1,
-    //     Name = "Aung Nyein Chan",
-    //     Email = "aungnyeinchan@gmail.com",
-    //     Password = "123456",
-    //     ProfileImage = "https:i.pravatar.cc/300?img=12",
-
-    //     Role = new Role
-    //     {
-    //         RoleId = 1,
-    //         Name = "Admin"
-    //     },
-
-    //     Quotes = new List<string>
-    //     {
-    //         "Stay hard.",
-    //         "Never give up.",
-    //         "Code everyday."
-    //     },
-
-    //     Comments = new List<string>
-    //     {
-    //         "Great post!",
-    //         "Awesome UI!",
-    //         "Very helpful."
-    //     },
-
-    //     Likes = new List<string>
-    //     {
-    //         "Post 1",
-    //         "Post 2",
-    //         "Post 3",
-    //         "Post 4",
-    //         "Post 5"
-    //     }
-    // };
-
-    // public class UserProfile
-    // {
-    //     public int UserId { get; set; }
-
-    //     public string Name { get; set; } = string.Empty;
-
-    //     public string Password { get; set; } = string.Empty;
-
-    //     public string Email { get; set; } = string.Empty;
-
-    //     public string ProfileImage { get; set; } = string.Empty;
-
-    //     public Role Role { get; set; } = new();
-
-    //     public List<string> Quotes { get; set; } = new();
-
-    //     public List<string> Comments { get; set; } = new();
-
-    //     public List<string> Likes { get; set; } = new();
-    // }
-
-    // public class Role
-    // {
-    //     public int RoleId { get; set; }
-
-    //     public string Name { get; set; } = string.Empty;
-    // }
+    
 }

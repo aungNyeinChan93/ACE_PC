@@ -64,25 +64,56 @@ namespace ACE_PC.BL.Services
                 .Include(u => u.Comments)!.ThenInclude(c => c.Quote)
                 .Include(u => u.Comments)!.ThenInclude(c => c.User)
                 .Include(u => u.Likes)!.ThenInclude(l => l.Quote)!.ThenInclude(q => q!.User)!
-                .Include(u => u.Likes)!.ThenInclude(l => l.User)!
+                .Include(u => u.Likes)!.ThenInclude(l => l.User)
                 .Select(u => new UserDto
                 {
                     UserId = u.UserId,
-                    Name = u.Name,
                     Email = u.Email,
                     Role = u.Role,
-                    Quotes = u.Quotes,
+                    Quotes = u.Quotes!.Select(q => new QuotesDto
+                    {
+                        Author = q.User!.Name,
+                        AuthorId = q.UserId,
+                        Category = q.Category!.Name,
+                        CategoryId = q.UserId,
+                        Comments = q.Comments!.Select(c=>new CommentDto
+                        {
+                            Content = c.Body,
+                            Id = c.CommentId,
+                            UserName = c.User!.Name,
+                        }).ToList(),
+                        Content = q.Content,
+                        CreatedAt = q.CreatedAt,
+                        Id = q.QuoteId,
+                        Likes = q.Likes!.Select(l=>new LikeDto
+                        {
+                            UserId =l.UserId,
+                            UserName = l.User!.Name,
+                        }).ToList(),
+                        Title = q.Title
+                    }).ToList(),
                     Password = u.Password,
                     Comments = u.Comments!.Select(c => new CommentDto
                     {
                         Id = c.CommentId,
                         Content = c.Body,
                         UserName = c.User!.Name
+                    }).OrderByDescending(u => u.Id).ToList(),
+                    Likes = u.Likes!.Select(l => new LikeDto
+                    {
+                        UserId = l.UserId,
+                        UserName = l.User!.Name,
                     }).ToList(),
-                    Likes = u.Likes!.ToList(),
-                    LikeQuotes = u.Likes!.Select(l => l.Quote).ToList()!
+                    LikeQuotes = u.Likes!.Select(l => new Quote
+                    {
+                        Title = l.Quote!.Title
+                    }).ToList(),
+                    Name = u.Name,
                 })
                 .ToListAsync();
+            
+
+           
 
             if (users is null || users.Count <= 0)
             {
@@ -127,24 +158,52 @@ namespace ACE_PC.BL.Services
                 .Include(u => u.Quotes)!
                 .Include(u => u.Comments)!.ThenInclude(c => c.Quote)
                 .Include(u => u.Comments)!.ThenInclude(c => c.User)
-                .Include(u => u.Likes)!.ThenInclude(l => l.Quote)!.ThenInclude(q => q!.User)!
-                .Include(u => u.Likes)!.ThenInclude(l => l.User)!
+                .Include(u => u.Likes)!.ThenInclude(l => l.Quote)
+                .Include(u => u.Likes)!.ThenInclude(l => l.User)
                 .Select(u => new UserDto
                 {
                     UserId = u.UserId,
-                    Name = u.Name,
                     Email = u.Email,
                     Role = u.Role,
-                    Quotes = u.Quotes,
+                    Quotes = u.Quotes!.Select(q => new QuotesDto
+                    {
+                        Author = q.User!.Name,
+                        AuthorId = q.UserId,
+                        Category = q.Category!.Name,
+                        CategoryId = q.UserId,
+                        Comments = q.Comments!.Select(c => new CommentDto
+                        {
+                            Content = c.Body,
+                            Id = c.CommentId,
+                            UserName = c.User!.Name,
+                        }).ToList(),
+                        Content = q.Content,
+                        CreatedAt = q.CreatedAt,
+                        Id = q.QuoteId,
+                        Likes = q.Likes!.Select(l => new LikeDto
+                        {
+                            UserId = l.UserId,
+                            UserName = l.User!.Name,
+                        }).ToList(),
+                        Title = q.Title
+                    }).ToList(),
                     Password = u.Password,
                     Comments = u.Comments!.Select(c => new CommentDto
                     {
                         Id = c.CommentId,
                         Content = c.Body,
                         UserName = c.User!.Name
+                    }).OrderByDescending(u => u.Id).ToList(),
+                    Likes = u.Likes!.Select(l => new LikeDto
+                    {
+                        UserId = l.UserId,
+                        UserName = l.User!.Name,
                     }).ToList(),
-                    Likes = u.Likes!.ToList(),
-                    LikeQuotes = u.Likes!.Select(l => l.Quote).ToList()!
+                    LikeQuotes = u.Likes!.Select(l => new Quote
+                    {
+                        Title = l.Quote!.Title
+                    }).ToList(),
+                    Name = u.Name,
                 })
                 .Skip(skip)
                 .Take(pageCount)
@@ -178,34 +237,59 @@ namespace ACE_PC.BL.Services
             var responseModel = new ResultModel<UserResponse>();
 
             var user = await _context.Users.AsNoTracking()
-                .Include(u => u.Role)
-                .Include(u => u.Quotes)!.ThenInclude(q => q.Likes)
-                .Include(u => u.Quotes)!.ThenInclude(q => q.Category)
+                .Include(u => u.Role)!
+                .Include(u => u.Quotes)!
                 .Include(u => u.Comments)!.ThenInclude(c => c.Quote)
                 .Include(u => u.Comments)!.ThenInclude(c => c.User)
-                .Include(u => u.Likes)!.ThenInclude(l => l.User)
-                .Include(u => u.Likes)!.ThenInclude(l => l.Quote)
+                .Include(u => u.Likes)!.ThenInclude(l => l.Quote)!.ThenInclude(q => q!.User)!
+                .Include(u => u.Likes)!.ThenInclude(l => l.User)!
+                .Where(u => u.Email == email)
                 .Select(u => new UserDto
                 {
                     UserId = u.UserId,
                     Email = u.Email,
                     Role = u.Role,
+                    Quotes = u.Quotes!.Select(q => new QuotesDto
+                    {
+                        Author = q.User!.Name,
+                        AuthorId = q.UserId,
+                        Category = q.Category!.Name,
+                        CategoryId = q.UserId,
+                        Comments = q.Comments!.Select(c => new CommentDto
+                        {
+                            Content = c.Body,
+                            Id = c.CommentId,
+                            UserName = c.User!.Name,
+                        }).ToList(),
+                        Content = q.Content,
+                        CreatedAt = q.CreatedAt,
+                        Id = q.QuoteId,
+                        Likes = q.Likes!.Select(l => new LikeDto
+                        {
+                            UserId = l.UserId,
+                            UserName = l.User!.Name,
+                        }).ToList(),
+                        Title = q.Title
+                    }).ToList(),
                     Password = u.Password,
-                    Quotes = u.Quotes,
                     Comments = u.Comments!.Select(c => new CommentDto
                     {
                         Id = c.CommentId,
                         Content = c.Body,
                         UserName = c.User!.Name
+                    }).OrderByDescending(u => u.Id).ToList(),
+                    Likes = u.Likes!.Select(l => new LikeDto
+                    {
+                        UserId = l.UserId,
+                        UserName = l.User!.Name,
                     }).ToList(),
-                    Likes = u.Likes!.ToList(),
                     LikeQuotes = u.Likes!.Select(l => new Quote
                     {
                         Title = l.Quote!.Title
                     }).ToList(),
                     Name = u.Name,
                 })
-                .FirstOrDefaultAsync(u => u.Email == email);
+                .FirstOrDefaultAsync();
 
             if (user is null)
             {
@@ -238,26 +322,40 @@ namespace ACE_PC.BL.Services
                     UserId = u.UserId,
                     Email = u.Email,
                     Role = u.Role,
-                    Quotes = u.Quotes!.Select(q=>new Quote
+                    Quotes = u.Quotes!.Select(q => new QuotesDto
                     {
-                        QuoteId = q.QuoteId,
-                        Category = q.Category,
-                        Comments = q.Comments,
-                        CategoryId = q.CategoryId,
+                        Author = q.User!.Name,
+                        AuthorId = q.UserId,
+                        Category = q.Category!.Name,
+                        CategoryId = q.UserId,
+                        Comments = q.Comments!.Select(c => new CommentDto
+                        {
+                            Content = c.Body,
+                            Id = c.CommentId,
+                            UserName = c.User!.Name,
+                        }).ToList(),
                         Content = q.Content,
-                        Likes = q.Likes,
-                        Title = q.Title,
-                        User = q.User,
-                        UserId = q.UserId
-                    }).OrderByDescending(q=>q.QuoteId).ToList(),
+                        CreatedAt = q.CreatedAt,
+                        Id = q.QuoteId,
+                        Likes = q.Likes!.Select(l => new LikeDto
+                        {
+                            UserId = l.UserId,
+                            UserName = l.User!.Name,
+                        }).ToList(),
+                        Title = q.Title
+                    }).ToList(),
                     Password = u.Password,
                     Comments = u.Comments!.Select(c => new CommentDto
                     {
                         Id = c.CommentId,
                         Content = c.Body,
                         UserName = c.User!.Name
-                    }).OrderByDescending(u=>u.Id).ToList(),
-                    Likes = u.Likes!.ToList(),
+                    }).OrderByDescending(u => u.Id).ToList(),
+                    Likes = u.Likes!.Select(l => new LikeDto
+                    {
+                        UserId = l.UserId,
+                        UserName = l.User!.Name,
+                    }).ToList(),
                     LikeQuotes = u.Likes!.Select(l => new Quote
                     {
                         Title = l.Quote!.Title
@@ -326,16 +424,41 @@ namespace ACE_PC.BL.Services
                 {
                     UserId = u.UserId,
                     Email = u.Email,
-                    Role = u.Role,
-                    Quotes = u.Quotes,
+                    Role =u.Role,
+                    Quotes = u.Quotes!.Select(q => new QuotesDto
+                    {
+                        Author = q.User!.Name,
+                        AuthorId = q.UserId,
+                        Category = q.Category!.Name,
+                        CategoryId = q.UserId,
+                        Comments = q.Comments!.Select(c => new CommentDto
+                        {
+                            Content = c.Body,
+                            Id = c.CommentId,
+                            UserName = c.User!.Name,
+                        }).ToList(),
+                        Content = q.Content,
+                        CreatedAt = q.CreatedAt,
+                        Id = q.QuoteId,
+                        Likes = q.Likes!.Select(l => new LikeDto
+                        {
+                            UserId = l.UserId,
+                            UserName = l.User!.Name,
+                        }).ToList(),
+                        Title = q.Title
+                    }).ToList(),
                     Password = u.Password,
                     Comments = u.Comments!.Select(c => new CommentDto
                     {
                         Id = c.CommentId,
                         Content = c.Body,
                         UserName = c.User!.Name
+                    }).OrderByDescending(u => u.Id).ToList(),
+                    Likes = u.Likes!.Select(l => new LikeDto
+                    {
+                        UserId = l.UserId,
+                        UserName = l.User!.Name,
                     }).ToList(),
-                    Likes = u.Likes!.ToList(),
                     LikeQuotes = u.Likes!.Select(l => new Quote
                     {
                         Title = l.Quote!.Title
@@ -365,7 +488,7 @@ namespace ACE_PC.BL.Services
 
             responseModel = ResultModel<UsersResposne>.Success(200, "GetAll Users", data);
 
-        //skip:
+            //skip:
             return responseModel;
 
 
@@ -373,7 +496,7 @@ namespace ACE_PC.BL.Services
 
 
         //Update User
-        public async Task<ResultModel<UserEditResponse>> UpdateUserAsync(int id,UserEditRequest request)
+        public async Task<ResultModel<UserEditResponse>> UpdateUserAsync(int id, UserEditRequest request)
         {
             var responseModel = new ResultModel<UserEditResponse>();
 
@@ -381,7 +504,7 @@ namespace ACE_PC.BL.Services
 
             if (updateUser is null)
             {
-                responseModel = ResultModel<UserEditResponse>.ValidationError(404,"User not found!");
+                responseModel = ResultModel<UserEditResponse>.ValidationError(404, "User not found!");
                 goto skip;
             }
 
@@ -391,7 +514,7 @@ namespace ACE_PC.BL.Services
 
             if (!string.IsNullOrEmpty(request.Password))
             {
-                var hashPassword = new PasswordHasher<User>().HashPassword(updateUser,request.Password);
+                var hashPassword = new PasswordHasher<User>().HashPassword(updateUser, request.Password);
                 updateUser.Password = hashPassword;
             }
 

@@ -1,23 +1,39 @@
 ﻿@page "/quotes/detail/{quoteId:int}"
 @inject QuoteUseCases QuoteUseCases;
-@attribute [Authorize(Roles ="user,admin")]
+@* @inject UserUseCases UserUseCases; *@
+
+@attribute [Authorize(Roles = "user,admin")]
 
 @if (Quote is not null)
 {
     <QuoteDetailComponent Quote="Quote" LoadQuote="LoadQuote" />
 
+   
+
 }
 else
 {
-    <LoadingComponent/>
+    <LoadingComponent />
 }
 
+<pre>
+</pre>
 
 @code {
     [Parameter]
     public int QuoteId { get; set; }
 
     public QuotesDto Quote { get; set; } = new();
+
+
+    // private async Task LoadAuthUser()
+    // {
+    //     var authUser = await UserUseCases.GetAuthUser();
+    //     if (authUser is not null)
+    //     {
+    //         AuthUser = authUser ?? new();
+    //     }
+    // }
 
 
     private async Task LoadQuote()
