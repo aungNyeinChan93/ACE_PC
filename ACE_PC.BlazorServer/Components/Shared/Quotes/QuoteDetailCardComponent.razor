@@ -172,7 +172,6 @@
 
     public bool IsLike { get; set; } = false;
 
-
     private Task LikeState()
     {
         IsLike = Quote.Likes?.Any(l => l.UserId == AuthUser.UserId) ?? false;
@@ -222,7 +221,6 @@
         }
         catch (Exception)
         {
-
             throw;
         }
     }
