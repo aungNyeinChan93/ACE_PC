@@ -5,7 +5,7 @@
     <div class="row justify-content-center">
 
         <!-- Quote Card Section -->
-        <QuoteDetailCardComponent Quote="Quote" OnComment="HandleIsComment" />
+        <QuoteDetailCardComponent LoadQuote="LoadQuote" AuthUser="AuthUser" Quote="Quote" OnComment="HandleIsComment" />
 
         <!-- Comment Box Section-->
         @if (IsComment)
@@ -25,6 +25,8 @@
 </pre>
 
 @code {
+    [Parameter]
+    public UserDto AuthUser { get; set; } = new();
 
     [Parameter]
     public QuotesDto Quote { get; set; } = new();
@@ -33,6 +35,7 @@
 
     [Parameter]
     public EventCallback LoadQuote { get; set; }
+
 
     public async Task HandleIsComment(bool status)
     {

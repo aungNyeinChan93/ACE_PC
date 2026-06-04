@@ -70,9 +70,9 @@ namespace ACE_PC.BL.Services
         }
 
         //ToogleLikeAsync
-        public async Task<ResultModel<string>> ToogleLikeAsync(LikeCreateRequest requests)
+        public async Task<ResultModel<LikeCreateResponse>> ToogleLikeAsync(LikeCreateRequest requests)
         {
-            var responseModel = new ResultModel<string>();
+            var responseModel = new ResultModel<LikeCreateResponse>();
 
             var like = await _context.Likes.AsNoTracking()
               .FirstOrDefaultAsync(l => l.UserId == requests.UserId && l.QuoteId == requests.QuoteId);
@@ -81,9 +81,18 @@ namespace ACE_PC.BL.Services
             {
                 _context.Likes.Remove(like);
                 var result = await _context.SaveChangesAsync();
+
+                var data = new LikeCreateResponse
+                {
+                    LikeDto = new Domain.Dtos.Quotes.LikeDto
+                    {
+                        UserId = requests.UserId,
+                    },
+                    IsLike = false
+                };
                 responseModel = result >= 1
-                    ? ResultModel<string>.Success(200, "Like Delete Success", "Delete like")
-                    : ResultModel<string>.ValidationError(500, "Fail");
+                    ? ResultModel<LikeCreateResponse>.Success(200, "Like Delete Success",data)
+                    : ResultModel<LikeCreateResponse>.ValidationError(500, "Fail");
                 goto skip;
             }
 
@@ -104,9 +113,18 @@ namespace ACE_PC.BL.Services
                     .Select(x => x.Name)
                     .FirstOrDefaultAsync();
 
+                var data = new LikeCreateResponse
+                {
+                    LikeDto = new Domain.Dtos.Quotes.LikeDto
+                    {
+                        UserId = requests.UserId,
+                    },
+                    IsLike = true
+                };
+
                 responseModel = result >= 1
-               ? ResultModel<string>.Success(201, "Like Success", "Create Like Success")
-               : ResultModel<string>.SystemError(500, "Like Fail");
+               ? ResultModel<LikeCreateResponse>.Success(201, "Like Success", data)
+               : ResultModel<LikeCreateResponse>.SystemError(500, "Like Fail");
 
                 goto skip;
             }

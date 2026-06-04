@@ -8,5 +8,7 @@ namespace ACE_PC.Domain.Models.Likes
     public class LikeCreateResponse
     {
         public LikeDto LikeDto { get; set; }
+
+        public bool IsLike { get; set; } = false;
     }
 }

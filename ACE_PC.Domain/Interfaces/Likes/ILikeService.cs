@@ -10,6 +10,6 @@ namespace ACE_PC.Domain.Interfaces.Likes
     {
 
         Task<ResultModel<LikeCreateResponse>> CreateAsync(LikeCreateRequest requests);
-        Task<ResultModel<string>> ToogleLikeAsync(LikeCreateRequest requests);
+        Task<ResultModel<LikeCreateResponse>> ToogleLikeAsync(LikeCreateRequest requests);
     }
 }

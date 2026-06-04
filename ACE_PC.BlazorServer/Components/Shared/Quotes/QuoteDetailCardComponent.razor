@@ -1,4 +1,6 @@
 ﻿@inject LikesUseCase LikesUseCase;
+@inject ISnackbar Snackbar;
+
 
 <div class="col-lg-12">
     <div class="card rounded-4 overflow-hidden border-0 shadow-lg">
@@ -106,7 +108,14 @@
                     <!-- Like -->
                     <div class="col">
                         <button @onclick="LikeToogleAction" class="btn btn-light w-100 rounded-3 py-2">
-                            <i class="bi bi-heart text-danger me-2"></i>
+                            @if (IsLike)
+                            {
+                                <i class="bi bi-heart-fill text-danger me-2"></i>
+                            }
+                            else
+                            {
+                                <i class="bi bi-heart text-danger me-2"></i>
+                            }
                             Like
                         </button>
                     </div>
@@ -134,7 +143,7 @@
 
                     <small class="text-muted">
                         <i class="bi bi-heart-fill text-danger"></i>
-                        120 Likes
+                        @(Quote.Likes.Count)
                     </small>
 
                     <small class="text-muted">
@@ -149,6 +158,10 @@
 
 
 @code {
+
+    [Parameter]
+    public UserDto AuthUser { get; set; } = new();
+
     [Parameter]
     public QuotesDto Quote { get; set; } = new();
 
@@ -157,10 +170,67 @@
 
     public bool IsComment { get; set; } = false;
 
-    
+    public bool IsLike { get; set; } = false;
+
+
+    private Task LikeState()
+    {
+        IsLike = Quote.Likes?.Any(l => l.UserId == AuthUser.UserId) ?? false;
+        return Task.CompletedTask;
+    }
+
+    [Parameter]
+    public EventCallback LoadQuote { get; set; }
 
     private async Task LikeToogleAction()
     {
-        // var response = await LikesUseCase.LikeToogle();
+        try
+        {
+            var request = new LikeCreateRequest
+            {
+                QuoteId = Quote.Id,
+                UserId = AuthUser.UserId
+            };
+
+            var response = await LikesUseCase.LikeToogle(request);
+
+            if (response.IsError)
+            {
+                if (response.ResponseType == Domain.Helpers.ReqResHelper.EnumResponseType.Pending)
+                {
+                    Snackbar.Add(response.ResponseMessage);
+                    return;
+                }
+                if (response.ResponseType == Domain.Helpers.ReqResHelper.EnumResponseType.ValidationError)
+                {
+                    Snackbar.Add(response.ResponseMessage);
+                    return;
+                }
+                if (response.ResponseType == Domain.Helpers.ReqResHelper.EnumResponseType.SystemError)
+                {
+                    Snackbar.Add(response.ResponseMessage, Severity.Error);
+                    return;
+                }
+            }
+            if (response.IsSuccess)
+            {
+                await this.LoadQuote.InvokeAsync();
+                IsLike = response.Data!.IsLike;
+                Snackbar.Add(response.ResponseMessage, Severity.Success);
+                return;
+            }
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
     }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await LikeState();
+    }
+    
+
 }

@@ -27,14 +27,14 @@ namespace ACE_PC.BlazorServer.UseCases.Like
             }
         }
 
-        public async Task<ResultModel<string>> LikeToogle(LikeCreateRequest request)
+        public async Task<ResultModel<LikeCreateResponse>> LikeToogle(LikeCreateRequest request)
         {
             var response = await _httpClient.PostAsJsonAsync("/api/likes/toogle",request);
 
             if (response.IsSuccessStatusCode)
             {
                 var str = await response.Content.ReadAsStringAsync();
-                var result = JsonConvert.DeserializeObject<ResultModel<string>>(str);
+                var result = JsonConvert.DeserializeObject<ResultModel<LikeCreateResponse>>(str);
                 return result!;
             }
             return default!;
