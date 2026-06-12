@@ -64,5 +64,25 @@ namespace ACE_PC.BlazorServer.UseCases.Categories
             }
             return default!;
         }
+
+        //GetCategoryById
+        public async Task<ResultModel<CategoryResponse>> GetGategoryIdAsync(int id)
+        {
+            var response = await _httpClient.GetFromJsonAsync<ResultModel<CategoryResponse>>($"/api/categories/{id}");
+            return response!;
+        }
+
+        //updateCategory
+        public async Task<ResultModel<UpdateCategoryResponse>> UpdateCategoryAsync(int id,UpdateCategoryRequest request)
+        {
+            var response = await _httpClient.PutAsJsonAsync($"/api/categories/{id}", request);
+            if (response.IsSuccessStatusCode)
+            {
+                var str = await response.Content.ReadAsStringAsync();
+                var result = JsonConvert.DeserializeObject<ResultModel<UpdateCategoryResponse>>(str);
+                return result!;
+            }
+            return default!;
+        }
     }
 }

@@ -9,7 +9,7 @@ using System.Net.WebSockets;
 
 namespace ACE_PC.Api.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class CategoriesController : ControllerBase
@@ -93,6 +93,29 @@ namespace ACE_PC.Api.Controllers
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
             var response = await _categoryService.DeleteCategoryAsync(id);
+            if (response.IsError)
+            {
+                if (response.ResponseType == EnumResponseType.Pending)
+                {
+                    return StatusCode(102, response);
+                }
+                if (response.ResponseType == EnumResponseType.ValidationError)
+                {
+                    return BadRequest(response);
+                }
+                if (response.ResponseType == EnumResponseType.SystemError)
+                {
+                    return StatusCode(500, response);
+                }
+            }
+            return Ok(response);
+        }
+
+        //Update
+        [HttpPut("{id:int}")]
+        public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateCategoryRequest request)
+        {
+            var response = await _categoryService.UpdateCategory(id, request);
             if (response.IsError)
             {
                 if (response.ResponseType == EnumResponseType.Pending)

@@ -2,6 +2,7 @@
 using ACE_PC.Domain.Entity;
 using ACE_PC.Domain.Helpers.ReqResHelper;
 using ACE_PC.Domain.Interfaces.Categories;
+using ACE_PC.Domain.Mappers;
 using ACE_PC.Domain.Models.Categories;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -55,7 +56,9 @@ namespace ACE_PC.BL.Services
             var responseModel = new ResultModel<CategoryResponse>();
 
             var category = await _context.Categories.AsNoTracking()
-                .FirstOrDefaultAsync(c => c.CategoryId == id);
+                .Where(c => c.CategoryId == id)
+                .Select(x => x.ToCategoryDto())
+                .FirstOrDefaultAsync();
 
             if (category is null)
             {
@@ -122,6 +125,7 @@ namespace ACE_PC.BL.Services
             return responseModel;
         }
 
+        //UpdateCategory
         public async Task<ResultModel<UpdateCategoryResponse>> UpdateCategory(int id, UpdateCategoryRequest request)
         {
 
@@ -142,7 +146,7 @@ namespace ACE_PC.BL.Services
 
             responseModel = result >= 1
                 ? ResultModel<UpdateCategoryResponse>
-                .Success(200, "Update Success", new UpdateCategoryResponse { Category = updateCategory })
+                .Success(200, "Update Success", new UpdateCategoryResponse { Category = updateCategory.ToCategoryDto() })
                 : ResultModel<UpdateCategoryResponse>.SystemError(500, "Update Fail");
 
         skip:

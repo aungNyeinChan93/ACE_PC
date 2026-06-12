@@ -1,13 +1,12 @@
 ﻿using ACE_PC.Domain.Dtos.Categories;
-using ACE_PC.Domain.Entity;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace ACE_PC.Domain.Models.Categories
 {
-    public class CategoryResponse
+    public class EditCategoryResponse
     {
-        public  CategoryDto? Category { get; set; }
+        public CategoryDto CategoryDto { get; set; } = new();
     }
 }

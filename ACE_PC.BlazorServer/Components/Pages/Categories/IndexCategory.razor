@@ -1,7 +1,7 @@
 ﻿@page "/categories"
 @inject CategoriesUseCase CategoriesUseCase;
 @inject NavigationManager NavigationManager;
-@inject IToastService toastService
+@inject ISnackbar Snackbar;
 @attribute [Authorize(Roles = "admin,user")]
 
 
@@ -74,10 +74,10 @@
 
                                             <AuthorizeView Roles="admin">
                                                 <Authorized>
-                                                    @* <button class="btn btn-outline-primary btn-sm">
+                                                    <button @onclick="@(()=>NavigationManager.NavigateTo($"/categories/edit/{category.CategoryId}"))" class="btn btn-outline-primary btn-sm">
                                                         <i class="bi bi-pencil-square"></i>
                                                         Edit
-                                                    </button> *@
+                                                    </button> 
                                                     <button class="btn btn-outline-danger btn-sm"
                                                             @onclick="() =>
                                                             {
@@ -199,7 +199,7 @@
         var response = await CategoriesUseCase.DeleteCategory(DeleteId);
         if (response.IsSuccess)
         {
-            toastService.ShowSuccess("Delete Success");
+            Snackbar.Add(response.ResponseMessage, Severity.Success);
             NavigationManager.NavigateTo("/categories");
             Modal.Close();
             await this.LoadCategories();
