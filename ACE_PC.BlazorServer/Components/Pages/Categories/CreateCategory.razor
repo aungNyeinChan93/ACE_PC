@@ -1,0 +1,126 @@
+@page "/categories/create"
+
+@inject ACE_PC.BlazorServer.UseCases.Categories.CategoriesUseCase CategoriesUseCase
+@inject NavigationManager Nav
+@inject ISnackbar Snackbar
+
+@using Microsoft.AspNetCore.Components.Forms
+@using ACE_PC.Domain.Models.Categories
+
+<div class="container mt-5">
+
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+
+            <div class="card shadow-lg border-0">
+
+                <div class="card-header bg-primary text-white py-3">
+                    <h3 class="mb-0">
+                        <i class="bi bi-folder-plus me-2"></i>
+                        Create Category
+                    </h3>
+                </div>
+
+                <div class="card-body p-4">
+
+                    @if (!string.IsNullOrWhiteSpace(Error))
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            @Error
+                        </div>
+                    }
+
+                    <EditForm Model="model" OnValidSubmit="HandleValidSubmit">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary class="text-danger mb-3" />
+
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">
+                                Category Name
+                            </label>
+
+                            <InputText class="form-control form-control-lg"
+                                       placeholder="Enter category name..."
+                                       @bind-Value="model.Name" />
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2">
+
+                            <button type="button"
+                                    class="btn btn-outline-secondary"
+                                    @onclick="@(() => Nav.NavigateTo("/categories"))"
+                                    disabled="@IsSaving">
+                                <i class="bi bi-arrow-left"></i>
+                                Cancel
+                            </button>
+
+                            <button type="submit"
+                                    class="btn btn-success"
+                                    disabled="@IsSaving">
+
+                                @if (IsSaving)
+                                {
+                                    <span class="spinner-border spinner-border-sm me-2"></span>
+                                    <span>Saving...</span>
+                                }
+                                else
+                                {
+                                    <span>
+                                        <i class="bi bi-check-circle"></i>
+                                        Save Category
+                                    </span>
+                                }
+
+                            </button>
+
+                        </div>
+
+                    </EditForm>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+@code {
+
+    private CreateCategoryRequest model = new();
+
+    private string Error { get; set; } = string.Empty;
+
+    private bool IsSaving { get; set; }
+
+    private async Task HandleValidSubmit()
+    {
+        try
+        {
+            Error = string.Empty;
+            IsSaving = true;
+
+            var response = await CategoriesUseCase.CreateCategoryAsync(model);
+
+            if (response.IsError)
+            {
+                Error = response.ResponseMessage;
+                return;
+            }
+
+            Snackbar.Add(response.ResponseMessage, Severity.Success);
+
+            Nav.NavigateTo("/categories");
+        }
+        catch (Exception ex)
+        {
+            Error = ex.Message;
+        }
+        finally
+        {
+            IsSaving = false;
+        }
+    }
+}

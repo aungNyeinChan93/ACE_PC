@@ -2,6 +2,7 @@
 using ACE_PC.Domain.Helpers.ReqResHelper;
 using ACE_PC.Domain.Models.Categories;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+using Newtonsoft.Json;
 using System.Net.Http.Headers;
 
 namespace ACE_PC.BlazorServer.UseCases.Categories
@@ -27,6 +28,7 @@ namespace ACE_PC.BlazorServer.UseCases.Categories
             }
         }
 
+        //GetAllAsync
         public async Task<ResultModel<CategoriesResponse>> GetAllAsync()
         {
             await this.SetAuthHeader();
@@ -41,12 +43,26 @@ namespace ACE_PC.BlazorServer.UseCases.Categories
             
         }
 
+        //DeleteCategory
         public async Task<ResultModel<bool>> DeleteCategory(int id)
         {
             await this.SetAuthHeader();
             var response = await _httpClient.DeleteFromJsonAsync<ResultModel<bool>>($"/api/categories/{id}");
             
             return response!;
+        }
+
+        //CreateCategory
+        public async Task<ResultModel<CreateCategoryResponse>> CreateCategoryAsync(CreateCategoryRequest request)
+        {
+            var response = await _httpClient.PostAsJsonAsync("/api/categories",request);
+            if (response.IsSuccessStatusCode)
+            {
+                var str = await response.Content.ReadAsStringAsync();
+                var result = JsonConvert.DeserializeObject<ResultModel<CreateCategoryResponse>>(str);
+                return result!;
+            }
+            return default!;
         }
     }
 }

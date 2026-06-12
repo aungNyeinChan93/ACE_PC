@@ -1,6 +1,9 @@
 ﻿@using ACE_PC.Domain.Entity
 @using Microsoft.AspNetCore.Components.Forms
 
+@attribute [Authorize]
+@inject UserUseCases UserUseCases;
+
 <EditForm Model="@User" OnValidSubmit="CreateUserAsync">
 
     <DataAnnotationsValidator />
@@ -50,6 +53,8 @@
                     <ValidationMessage For="@(() => User.Password)" />
                 </div>
 
+
+
                 <!-- Role -->
                 <div class="col-md-6">
                     <label class="form-label">Role</label>
@@ -59,12 +64,28 @@
 
                         <option value="0">Select Role</option>
 
-                        @foreach (var role in Roles)
+                        @if (AuthUser.Role is not null)
                         {
-                            <option value="@role.RoleId">
-                                @role.Name
-                            </option>
+                            if (AuthUser.Role.Name == "admin")
+                            {
+                                @foreach (var role in Roles)
+                                {
+                                    <option value="@role.RoleId">
+                                        @role.Name
+                                    </option>
+                                }
+
+                            }
+                            
                         }
+                        else
+                        {
+                            <option value="1">User</option>
+
+                        }
+
+
+
 
                     </InputSelect>
 
@@ -81,7 +102,7 @@
 
                 <button type="button"
                         class="btn btn-outline-secondary"
-         2               @onclick="ResetForm">
+                        2 @onclick="ResetForm">
                     <i class="bi bi-arrow-counterclockwise"></i>
                     Reset
                 </button>
@@ -100,7 +121,14 @@
 
 </EditForm>
 
+<pre>
+    @(JsonConvert.SerializeObject(AuthUser.Role, Formatting.Indented))
+    @(JsonConvert.SerializeObject(AuthUser, Formatting.Indented))
+</pre>
+
 @code {
+
+    public UserDto AuthUser { get; set; } = new();
 
     [Parameter]
     public EventCallback<User> OnSubmit { get; set; }
@@ -121,5 +149,23 @@
     private void ResetForm()
     {
         User = new User();
+    }
+
+    private async Task LoadAuthUser()
+    {
+        var response = await UserUseCases.GetAuthUser();
+        if (response is not null)
+        {
+            AuthUser = response;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await this.LoadAuthUser();
+            StateHasChanged();
+        }
     }
 }
